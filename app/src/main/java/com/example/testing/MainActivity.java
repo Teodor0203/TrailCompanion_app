@@ -1,40 +1,21 @@
 package com.example.testing;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Scene;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.Manifest;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -47,14 +28,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
     //region UI Variables
-    private TextView DHT11dataShow, deviceConected;
+    private TextView deviceConected;
     private Button connectToDevice, startButton, goButton; // Adăugăm un buton pentru conexiunea la ESP
-    private ViewGroup rootContainer;
-    private Scene mapScene, menuScene;
     private ProgressBar loadingConnetion;
 
     //endregion
 
+    @SuppressLint({"MissingInflatedId", "ResourceType"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,32 +58,13 @@ public class MainActivity extends AppCompatActivity{
         }
         //endregion
 
-        //region UI elements initialize
-        // buttonON = findViewById(R.id.button1);
-        // buttonOFF = findViewById(R.id.button2);
-        // buttonDeviceList = findViewById(R.id.button5);
-        //DHT11dataShow = findViewById(R.id.textView3);
-        connectToDevice = findViewById(R.id.button);
-        startButton = findViewById(R.id.button2);
-        startButton.setVisibility(View.INVISIBLE);
-        LayoutInflater inflater = LayoutInflater.from(this);
-        deviceConected = findViewById(R.id.textView4);
-        rootContainer = findViewById(R.id.rootContainer);
-        loadingConnetion = findViewById(R.id.progressBar);
-        loadingConnetion.getIndeterminateDrawable().setColorFilter(Color.GRAY, android.graphics.PorterDuff.Mode.MULTIPLY);
-        loadingConnetion.setVisibility(View.INVISIBLE);
-        //endregion
+        if(savedInstanceState == null)
+        {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.rootContainer, new FragmentConnection())
+                    .commit();
 
-        ConnectionManager connectionManager = new ConnectionManager(MainActivity.this, loadingConnetion, deviceConected, startButton);
+        }
 
-        connectToDevice.setOnClickListener(view -> {
-            connectionManager.enableBluetooth(this);
-            connectionManager.connectToESP();
-        });
-
-        startButton.setOnClickListener(view -> {
-            Transition explode = new Fade();
-            TransitionManager.go(menuScene, explode);
-        });
     }
 }

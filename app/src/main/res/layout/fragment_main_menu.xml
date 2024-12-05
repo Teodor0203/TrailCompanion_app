@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/main_menu_fragment"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainMenu">
+    tools:context=".FragmentMainMenu">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -36,7 +36,7 @@
             android:shadowDx="-2"
             android:shadowDy="2"
             android:shadowRadius="5"
-            android:text="TrailCompanion"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="38dp"
             app:layout_constraintBottom_toBottomOf="parent"

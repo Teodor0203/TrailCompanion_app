@@ -51,6 +51,7 @@ public class ConnectionManager implements DataCallback{
     //endregion
 
     //region other
+    private static ConnectionManager INSTACE;
     private Context context;
     private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
@@ -73,11 +74,29 @@ public class ConnectionManager implements DataCallback{
         checkIfBluetoothIsSupported();
     }
 
+    public static ConnectionManager getInstance()
+    {
+        if(INSTACE == null)
+        {
+            INSTACE = new ConnectionManager();
+        }
+
+        return INSTACE;
+    }
+    public static ConnectionManager getInstance(Context context, ProgressBar progressBar, TextView textView, Button startButton)
+    {
+        if(INSTACE == null)
+        {
+            INSTACE = new ConnectionManager(context, progressBar, textView, startButton);
+        }
+
+        return INSTACE;
+    }
+
     public void checkIfBluetoothIsSupported()
     {
         if (adapter == null) {
             Toast.makeText(context, "Bluetooth is not supported!!", Toast.LENGTH_LONG).show();
-            return;
         }
     }
 
@@ -144,6 +163,10 @@ public class ConnectionManager implements DataCallback{
         }
     }
     //endregion
+
+    private boolean isConnectionActive() {
+        return bluetoothSocket != null && bluetoothSocket.isConnected();
+    }
 
     @SuppressLint("MissingPermission")
     public void connectToESP()
@@ -243,8 +266,13 @@ public class ConnectionManager implements DataCallback{
         try {
             bluetoothSocket = device.createRfcommSocketToServiceRecord(SPP_UUID);
             bluetoothSocket.connect();
-            inputStream = bluetoothSocket.getInputStream();
-            Log.d(TAG, "Connected to device: " + device.getName());
+            if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
+                inputStream = bluetoothSocket.getInputStream();
+                isConnected = true; // Setează flag-ul de conexiune activă
+                Log.d(TAG, "Connection established and inputStream initialized.");
+            } else {
+                Log.e(TAG, "Failed to initialize inputStream.");
+            }
         } catch (IOException e) {
             Log.e(TAG, "Error connecting to device: " + e.getMessage());
             try {
@@ -273,6 +301,7 @@ public class ConnectionManager implements DataCallback{
 
     public void readData(DataCallback callback)  {
         new Thread(() -> {
+
             StringBuilder dataBuilder = new StringBuilder();
             try {
                 byte[] buffer = new byte[1024];

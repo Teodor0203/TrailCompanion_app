@@ -1,10 +1,10 @@
 package com.example.testing;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,17 +17,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link Maps#newInstance} factory method to
+ * Use the {@link FragmentMaps#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Maps extends Fragment implements OnMapReadyCallback {
+public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
+    private final String TAG = "MapsFragment";
     private GoogleMap mMap;
     private Trail trail;
     private static final String ARG_PARAM1 = "param1";
@@ -37,7 +39,7 @@ public class Maps extends Fragment implements OnMapReadyCallback {
     private String mParam1;
     private String mParam2;
 
-    public Maps() {
+    public FragmentMaps() {
         // Required empty public constructor
     }
 
@@ -50,8 +52,8 @@ public class Maps extends Fragment implements OnMapReadyCallback {
      * @return A new instance of fragment Maps.
      */
     // TODO: Rename and change types and number of parameters
-    public static Maps newInstance(String param1, String param2) {
-        Maps fragment = new Maps();
+    public static FragmentMaps newInstance(String param1, String param2) {
+        FragmentMaps fragment = new FragmentMaps();
         Bundle args = new Bundle();
 
         args.putString(ARG_PARAM1, param1);
@@ -69,9 +71,7 @@ public class Maps extends Fragment implements OnMapReadyCallback {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        FragmentManager fragmentManager = getFragmentManager(); //I want to get the trail from MainMenu.
-        MainMenu mainMenuFragment = (MainMenu) fragmentManager.findFragmentById(R.id.main_menu_fragment);
-        trail = mainMenuFragment.getTrail();
+
     }
 
     @Override
@@ -80,11 +80,13 @@ public class Maps extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         } else {
-            Log.e("MapFragment", "MapFragment not found!");
+            Log.e(TAG, "MapFragment not found!");
         }
 
         return view;
@@ -92,14 +94,25 @@ public class Maps extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        Log.d("ConnectionManager", "onMapReady: MapReady");
+        Log.d(TAG, "onMapReady: MapReady");
         mMap = googleMap;
+
+        trail = FragmentMainMenu.getInstance().getTrail();
 
         List<GpsWaypoint> waypoints = new ArrayList<>();
         for (GpsWaypoint gpsWaypoint : trail.getWaypoints())
         {
             waypoints.add(gpsWaypoint);
         }
+
+        if (!waypoints.isEmpty())
+        {
+            LatLng firstMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
+            mMap.addMarker(new MarkerOptions().position(firstMarker).title("Marker 1"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 12));
+        }
+
+        List<LatLng> polylinePoints = new ArrayList<>();
 
         for (int i = 1; i < waypoints.size(); i++)
         {
@@ -110,18 +123,20 @@ public class Maps extends Fragment implements OnMapReadyCallback {
             {
                 mMap.addMarker(new MarkerOptions().position(marker).title("Marker " + (i + 1)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker, 12));
+                polylinePoints.add(marker);
             }
             else
             {
-                Log.e("ConnectionManager", "Duplicate marker at index " + i);
+                Log.e(TAG, "Duplicate marker at index " + i);
             }
         }
 
-        if (!waypoints.isEmpty())
+        if(!polylinePoints.isEmpty())
         {
-            LatLng firstMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
-            mMap.addMarker(new MarkerOptions().position(firstMarker).title("Marker 1"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 12));
+            mMap.addPolyline(new PolylineOptions()
+                    .addAll(polylinePoints)
+                    .color(Color.BLUE)
+                    .width(5));
         }
     }
 }
