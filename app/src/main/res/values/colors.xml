@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="backgroundColor">#111521</color>
+    <color name="ViewColor">#0f0f0f</color>
+    <color name="PrimaryColorIDK">#0f0f0f</color>
+    <color name="buttonLightTheme_border">@color/white</color>
+    <color name="shadow">#38aaaa</color>
+</resources>
