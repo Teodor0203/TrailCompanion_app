@@ -23,7 +23,6 @@ import org.json.JSONObject;
  * create an instance of this fragment.
  */
 public class MainMenu extends Fragment {
-
     private ConnectionManager connectionManager;
     private NEO6M gpsModule;
     private Trail trail;
@@ -34,6 +33,7 @@ public class MainMenu extends Fragment {
     private String mParam2, mParam1;
 
     public MainMenu() {
+
     }
 
     public static MainMenu newInstance(String param1, String param2) {
@@ -58,10 +58,6 @@ public class MainMenu extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-    }
-
-    public Trail getTrail() {
-        return trail;
     }
 
     @Override
@@ -111,5 +107,10 @@ public class MainMenu extends Fragment {
                 }
             });
         });
+    }
+
+    public Trail getTrail()
+    {
+        return trail;
     }
 }
