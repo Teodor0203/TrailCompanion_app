@@ -22,12 +22,17 @@ import org.json.JSONObject;
  */
 public class FragmentMainMenu extends Fragment {
     private NEO6M gpsModule;
-    private Trail trail;
+    private static Trail trail;
     private DHT11 dht11Sensor;
+    private final String TAG = "FragmentMainMenu";
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private String mParam2, mParam1;
+
+    public static void updateTrail(Trail newTrail) {
+        trail = newTrail;
+    }
 
     public FragmentMainMenu() {
 
@@ -102,6 +107,10 @@ public class FragmentMainMenu extends Fragment {
                                     gpsModule.readData(jsonData.toString());
 
                                     trail.addWaypoint();
+
+                                    FragmentMainMenu.updateTrail(trail);
+
+                                    Log.d("MapsFragment", "onViewCreated: " + trail.getWaypoints().toString());
                                 }
                             }
                             catch (JSONException e)
@@ -129,7 +138,7 @@ public class FragmentMainMenu extends Fragment {
         });
     }
 
-    public Trail getTrail()
+    public static Trail getTrail()
     {
         return trail;
     }

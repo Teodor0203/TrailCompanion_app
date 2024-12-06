@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -19,6 +20,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +33,12 @@ import java.util.List;
  */
 public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
+    private Trail trail;
     private final String TAG = "MapsFragment";
     private GoogleMap mMap;
-    private Trail trail;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -71,7 +76,7 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-
+        trail = FragmentMainMenu.getTrail();
     }
 
     @Override
@@ -80,16 +85,19 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-
-
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         } else {
             Log.e(TAG, "MapFragment not found!");
         }
-
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
     }
 
     @Override
@@ -97,12 +105,12 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "onMapReady: MapReady");
         mMap = googleMap;
 
-        trail = FragmentMainMenu.getInstance().getTrail();
-
+        List<LatLng> polylinePoints = new ArrayList<>();
         List<GpsWaypoint> waypoints = new ArrayList<>();
         for (GpsWaypoint gpsWaypoint : trail.getWaypoints())
         {
             waypoints.add(gpsWaypoint);
+            Log.d(TAG, "onMapReady: Waypoint added");
         }
 
         if (!waypoints.isEmpty())
@@ -110,9 +118,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             LatLng firstMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
             mMap.addMarker(new MarkerOptions().position(firstMarker).title("Marker 1"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 12));
+            Log.d(TAG, "onMapReady: Primul punct: " + firstMarker);
         }
-
-        List<LatLng> polylinePoints = new ArrayList<>();
 
         for (int i = 1; i < waypoints.size(); i++)
         {
@@ -122,7 +129,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             if (!marker.equals(previousMarker))
             {
                 mMap.addMarker(new MarkerOptions().position(marker).title("Marker " + (i + 1)));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker, 12));
                 polylinePoints.add(marker);
             }
             else
@@ -138,5 +144,7 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                     .color(Color.BLUE)
                     .width(5));
         }
+
+
     }
 }
