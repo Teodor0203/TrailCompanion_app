@@ -63,8 +63,9 @@ public class MainActivity extends AppCompatActivity{
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.rootContainer, new FragmentConnection())
                     .commit();
-
         }
+
+
 
     }
 }

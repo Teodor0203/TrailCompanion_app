@@ -268,7 +268,7 @@ public class ConnectionManager implements DataCallback{
             bluetoothSocket.connect();
             if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
                 inputStream = bluetoothSocket.getInputStream();
-                isConnected = true; // Setează flag-ul de conexiune activă
+                isConnected = true;
                 Log.d(TAG, "Connection established and inputStream initialized.");
             } else {
                 Log.e(TAG, "Failed to initialize inputStream.");

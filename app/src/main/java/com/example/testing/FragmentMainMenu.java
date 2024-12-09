@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,19 +25,14 @@ public class FragmentMainMenu extends Fragment {
     private NEO6M gpsModule;
     private static Trail trail;
     private DHT11 dht11Sensor;
+    private static GpsWaypoint gpsWaypoint;
     private final String TAG = "FragmentMainMenu";
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private String mParam2, mParam1;
 
-    public static void updateTrail(Trail newTrail) {
-        trail = newTrail;
-    }
-
-    public FragmentMainMenu() {
-
-    }
+    public FragmentMainMenu() {}
 
     private static FragmentMainMenu INSTANCE = null;
 
@@ -57,11 +53,16 @@ public class FragmentMainMenu extends Fragment {
         gpsModule = new NEO6M("NEO6M", true);
         dht11Sensor = new DHT11("DHT11", true);
         trail = new Trail(gpsModule);
+        GpsWaypoint gpsWaypoint = gpsModule.getWaypoint();
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
+
+    public static GpsWaypoint getGpsWaypoint() {
+        return gpsWaypoint;
     }
 
     public static FragmentMainMenu getInstance()
@@ -79,6 +80,8 @@ public class FragmentMainMenu extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        SharedViewmodel sharedViewmodel = new ViewModelProvider(requireActivity()).get(SharedViewmodel.class);
 
         Button goButton = view.findViewById(R.id.button3);
 
@@ -106,11 +109,11 @@ public class FragmentMainMenu extends Fragment {
                                 {
                                     gpsModule.readData(jsonData.toString());
 
-                                    trail.addWaypoint();
+                                    gpsWaypoint = gpsModule.getWaypoint();
 
-                                    FragmentMainMenu.updateTrail(trail);
+                                    sharedViewmodel.setWaypointMutableLiveData(gpsWaypoint);
 
-                                    Log.d("MapsFragment", "onViewCreated: " + trail.getWaypoints().toString());
+                                    Log.d("MapsFragment", "onViewCreated: " + gpsModule.getWaypoint().toString());
                                 }
                             }
                             catch (JSONException e)
