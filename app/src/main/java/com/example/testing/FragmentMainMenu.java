@@ -25,6 +25,7 @@ public class FragmentMainMenu extends Fragment {
     private NEO6M gpsModule;
     private static Trail trail;
     private DHT11 dht11Sensor;
+    private RFP602 rfp602sensor;
     private static GpsWaypoint gpsWaypoint;
     private final String TAG = "FragmentMainMenu";
 
@@ -52,6 +53,7 @@ public class FragmentMainMenu extends Fragment {
 
         gpsModule = new NEO6M("NEO6M", true);
         dht11Sensor = new DHT11("DHT11", true);
+        rfp602sensor = new RFP602("RFP602", true);
         trail = new Trail(gpsModule);
         GpsWaypoint gpsWaypoint = gpsModule.getWaypoint();
 
@@ -104,8 +106,12 @@ public class FragmentMainMenu extends Fragment {
                                 if(dht11Sensor.getSensorType().equals(sensorType))
                                 {
                                     dht11Sensor.readData(jsonData.toString());
-                                }
-                                else if(gpsModule.getSensorType().equals(sensorType))
+                                    Log.d(TAG, "onViewCreated: Reading DHT");
+                                } else if (rfp602sensor.getSensorType().equals(sensorType)) {
+                                    rfp602sensor.readData(jsonData.toString());
+                                    Log.d(TAG, "onViewCreated: Reading RFP");
+                                    
+                                } else if(gpsModule.getSensorType().equals(sensorType))
                                 {
                                     gpsModule.readData(jsonData.toString());
 
@@ -113,7 +119,7 @@ public class FragmentMainMenu extends Fragment {
 
                                     sharedViewmodel.setWaypointMutableLiveData(gpsWaypoint);
 
-                                    Log.d("MapsFragment", "onViewCreated: " + gpsModule.getWaypoint().toString());
+                                    Log.d(TAG, "onViewCreated: " + gpsModule.getWaypoint().toString());
                                 }
                             }
                             catch (JSONException e)
