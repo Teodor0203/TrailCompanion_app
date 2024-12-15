@@ -15,10 +15,10 @@ public class Trail {
     public void addWaypoint(){
         GpsWaypoint currentWaypoint = gpsModule.getWaypoint();
         if (currentWaypoint != null) {
-            System.out.println("Adding waypoint: " + currentWaypoint);
+            //System.out.println("Adding waypoint: " + currentWaypoint);
             waypoints.add(currentWaypoint);
         } else {
-            System.out.println("Current waypoint is null");
+            //System.out.println("Current waypoint is null");
         }
     }
 

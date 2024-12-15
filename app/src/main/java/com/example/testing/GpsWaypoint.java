@@ -4,6 +4,7 @@ public class GpsWaypoint {
 
     private double latitude;
     private double longitude;
+    private long timeStamp;
 
     public GpsWaypoint() {
     }
@@ -12,9 +13,11 @@ public class GpsWaypoint {
         this.latitude = latitude;
     }
 
-    public synchronized void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
+    public synchronized void setLongitude(double longitude) { this.longitude = longitude; }
+
+    public synchronized void setTimeStamp(long timeStamp) { this.timeStamp = timeStamp; }
+
+    public long getTimeStamp() { return timeStamp; }
 
     public double getLatitude() {
         return latitude;
@@ -26,6 +29,6 @@ public class GpsWaypoint {
 
     @Override
     public String toString() {
-        return "latitude=" + latitude + ", longitude=" + longitude;
+        return "timeStamp= " + timeStamp + "latitude=" + latitude + ", longitude=" + longitude;
     }
 }

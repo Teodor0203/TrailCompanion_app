@@ -8,7 +8,7 @@ import org.json.JSONObject;
 public class NEO6M extends Sensor{
 
     private final String TAG = "NEO6M";
-    private GpsWaypoint waypoint = new GpsWaypoint();
+    private GpsWaypoint waypoint;
 
     public NEO6M(String sensorType, boolean isActive){
         super(sensorType, isActive);
@@ -28,9 +28,12 @@ public class NEO6M extends Sensor{
                 JSONObject dataFromNEO6M = jsonObject.getJSONObject("dataNEO6M");
                 double latitude = (dataFromNEO6M.getDouble("latitude"));
                 double longitude = (dataFromNEO6M.getDouble("longitude"));
+                long timeStamp = jsonObject.getLong("timeStamp");
 
+                waypoint = new GpsWaypoint();
                 waypoint.setLatitude(latitude);
                 waypoint.setLongitude(longitude);
+                waypoint.setTimeStamp(timeStamp);
 
                 Log.d(TAG, "readData: Waypoint " + getWaypoint());
 
@@ -47,5 +50,4 @@ public class NEO6M extends Sensor{
     public GpsWaypoint getWaypoint() {
         return waypoint;
     }
-
 }

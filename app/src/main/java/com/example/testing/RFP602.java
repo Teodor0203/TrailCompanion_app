@@ -1,54 +1,67 @@
 package com.example.testing;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
 public class RFP602 extends Sensor {
 
-    private String segmentColor;
     private final String TAG = "RFP602";
+    private PressureData pressureData;
+    private Context context;
 
-    public RFP602(String sensorType, boolean isActive)
+    public RFP602(String sensorType, boolean isActive, Context context)
     {
         super(sensorType, isActive);
+        this.context = context;
     }
 
     @Override
     public void readData(String jsonData, TextView textView) {
 
+    }
+
+    @Override
+    public void readData(String jsonData) {
         try
         {
             JSONObject jsonObject = new JSONObject(jsonData);
             if (jsonObject.getString("sensorType").equals(getSensorType()))
             {
                 JSONObject data = jsonObject.getJSONObject("dataRFP602");
-                double analogPressureValue = data.getDouble("analogPressureValue");
-                String brakingSegmentcolor;
+                long analogPressureValue = data.getLong("analogPressureValue");
+                long timeStamp = jsonObject.getLong("timeStamp");
 
-                if (analogPressureValue < 10)
-                {
-                    brakingSegmentcolor = "-> No pressure";
-                }
-                else if (analogPressureValue < 200)
-                {
-                    brakingSegmentcolor = "-> Green";
-                }
-                else if (analogPressureValue < 350)
-                {
-                    brakingSegmentcolor = "-> Yellow";
-                }
-                else if (analogPressureValue < 450)
-                {
-                    brakingSegmentcolor = "-> Orange";
-                }
-                else
-                {
-                    brakingSegmentcolor = "-> Red";
-                }
+                pressureData = new PressureData();
+                pressureData.setTimeStamp(timeStamp);
+                pressureData.setPressureValue(analogPressureValue);
 
-                this.segmentColor = brakingSegmentcolor;
+
+                /*File file = new File(context.getFilesDir(), "rfpValues.csv");
+
+                try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true))))
+                {
+                    writer.write(timeStamp + ", " + analogPressureValue);
+                    writer.newLine();
+                    writer.flush();
+                    Log.d(TAG, "readData: Date scrise! " + file.getAbsolutePath());
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }*/
+
+                Log.d("FragmentMainMenu", "readData: " + timeStamp + ": " + analogPressureValue);
             }
             else
                 Log.d(TAG, "Couldn't read data");
@@ -61,18 +74,13 @@ public class RFP602 extends Sensor {
         }
     }
 
-    @Override
-    public void readData(String jsonData) {
-
+    public PressureData getPressureData() {
+        return pressureData;
     }
 
     @Override
     public void saveDataToFile(String jsonData)
     {
         super.saveDataToFile(jsonData);
-    }
-
-    public String getSegmentColor() {
-        return segmentColor;
     }
 }

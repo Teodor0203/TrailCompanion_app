@@ -1,5 +1,6 @@
 package com.example.testing;
 
+import android.health.connect.datatypes.units.Pressure;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,7 +27,8 @@ public class FragmentMainMenu extends Fragment {
     private static Trail trail;
     private DHT11 dht11Sensor;
     private RFP602 rfp602sensor;
-    private static GpsWaypoint gpsWaypoint;
+    private GpsWaypoint gpsWaypoint;
+    private PressureData pressureData;
     private final String TAG = "FragmentMainMenu";
 
     private static final String ARG_PARAM1 = "param1";
@@ -53,23 +55,13 @@ public class FragmentMainMenu extends Fragment {
 
         gpsModule = new NEO6M("NEO6M", true);
         dht11Sensor = new DHT11("DHT11", true);
-        rfp602sensor = new RFP602("RFP602", true);
+        rfp602sensor = new RFP602("RFP602", true, getContext());
         trail = new Trail(gpsModule);
-        GpsWaypoint gpsWaypoint = gpsModule.getWaypoint();
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-    }
-
-    public static GpsWaypoint getGpsWaypoint() {
-        return gpsWaypoint;
-    }
-
-    public static FragmentMainMenu getInstance()
-    {
-        return INSTANCE;
     }
 
     @Override
@@ -91,7 +83,7 @@ public class FragmentMainMenu extends Fragment {
 
             if (ConnectionManager.getInstance().isConnected())
             {
-                Log.d("ConnectionManager", "onViewCreated: S-a conectat");
+                Log.d(TAG, "onViewCreated: Connected");
                 ConnectionManager.getInstance().readData(data -> {
                     if(data != null && !data.isEmpty())
                     {
@@ -107,35 +99,40 @@ public class FragmentMainMenu extends Fragment {
                                 {
                                     dht11Sensor.readData(jsonData.toString());
                                     Log.d(TAG, "onViewCreated: Reading DHT");
-                                } else if (rfp602sensor.getSensorType().equals(sensorType)) {
+                                }
+                                else if (rfp602sensor.getSensorType().equals(sensorType))
+                                {
                                     rfp602sensor.readData(jsonData.toString());
-                                    Log.d(TAG, "onViewCreated: Reading RFP");
-                                    
-                                } else if(gpsModule.getSensorType().equals(sensorType))
+
+                                    pressureData = rfp602sensor.getPressureData();
+
+                                    sharedViewmodel.updatePressureData(pressureData);
+                                }
+                                else if(gpsModule.getSensorType().equals(sensorType))
                                 {
                                     gpsModule.readData(jsonData.toString());
 
                                     gpsWaypoint = gpsModule.getWaypoint();
 
-                                    sharedViewmodel.setWaypointMutableLiveData(gpsWaypoint);
+                                    sharedViewmodel.updateGpsWaypoint(gpsWaypoint);
 
                                     Log.d(TAG, "onViewCreated: " + gpsModule.getWaypoint().toString());
                                 }
                             }
                             catch (JSONException e)
                             {
-                                Log.d("ConnectionManager", "Error parsing JSON message: " + message);
+                                Log.d(TAG, "Error parsing JSON message: " + message);
                             }
                         }
                     }
                     else {
-                        Log.d("MainActivity", "Data is null or empty");
+                        Log.d(TAG, "Data is null or empty");
                     }
                 });
             }
             else
             {
-                Log.d("Connectionmanager", "onViewCreated: Nu este");
+                Log.d(TAG, "onViewCreated: Nu este");
             }
 
             getParentFragmentManager().beginTransaction().setCustomAnimations(
