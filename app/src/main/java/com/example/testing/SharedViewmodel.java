@@ -24,7 +24,6 @@ public class SharedViewmodel extends ViewModel {
     public void updateGpsWaypoint(GpsWaypoint gpsWaypoint)
     {
         Data currentData = dataLiveData.getValue();
-        Log.d(TAG, "updateGpsWaypoint: CALLED");
 
         if(currentData == null)
         {
@@ -38,7 +37,6 @@ public class SharedViewmodel extends ViewModel {
 
     public void updatePressureData(PressureData pressureData) {
         Data currentData = dataLiveData.getValue();
-        Log.d(TAG, "updatePressureData: CALLED");
 
         if (currentData == null)
         {
