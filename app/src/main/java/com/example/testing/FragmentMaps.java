@@ -35,9 +35,7 @@ import java.util.List;
  */
 public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
-    private Trail trail;
     private final String TAG = "FragmentMaps";
-    GpsWaypoint gpsWaypoint;
     private GoogleMap mMap;
 
     private List<LatLng> markers = new ArrayList<>();
@@ -45,8 +43,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     private List<PressureData> pressureValues = new ArrayList<>();
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    private Button stopButton;
 
 
     // TODO: Rename and change types of parameters
@@ -112,9 +108,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        stopButton = view.findViewById(R.id.button4);
-
     }
 
     @Override
@@ -148,8 +141,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
                 pressureValues.add(newPressureData);
             }
-
-
 
             if (waypoint != null) {
                 if (mMap != null) {

@@ -24,7 +24,6 @@ import org.json.JSONObject;
  */
 public class FragmentMainMenu extends Fragment {
     private NEO6M gpsModule;
-    private static Trail trail;
     private DHT11 dht11Sensor;
     private RFP602 rfp602sensor;
     private GpsWaypoint gpsWaypoint;
@@ -56,7 +55,6 @@ public class FragmentMainMenu extends Fragment {
         gpsModule = new NEO6M("NEO6M", true);
         dht11Sensor = new DHT11("DHT11", true);
         rfp602sensor = new RFP602("RFP602", true, getContext());
-        trail = new Trail(gpsModule);
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -142,10 +140,5 @@ public class FragmentMainMenu extends Fragment {
                     R.anim.slide_in
             ).replace(R.id.main_menu_fragment, new FragmentMaps()).commit();
         });
-    }
-
-    public static Trail getTrail()
-    {
-        return trail;
     }
 }

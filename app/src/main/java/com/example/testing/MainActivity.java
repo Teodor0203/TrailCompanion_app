@@ -19,21 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 
 public class MainActivity extends AppCompatActivity{
 
-    NEO6M gpsModule = new NEO6M("NEO6M", true);
-    Trail trail = new Trail(gpsModule);
-    private GoogleMap mMap;
-
-    public Trail getTrail() {
-        return trail;
-    }
-
-    //region UI Variables
-    private TextView deviceConected;
-    private Button connectToDevice, startButton, goButton; // Adăugăm un buton pentru conexiunea la ESP
-    private ProgressBar loadingConnetion;
-
-    //endregion
-
     @SuppressLint({"MissingInflatedId", "ResourceType"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +49,5 @@ public class MainActivity extends AppCompatActivity{
                     .replace(R.id.rootContainer, new FragmentConnection())
                     .commit();
         }
-
-
-
     }
 }
