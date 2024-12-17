@@ -1,53 +1,39 @@
 package com.example.testing;
 
 import android.graphics.Color;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentMaps#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
     private final String TAG = "FragmentMaps";
     private GoogleMap mMap;
 
-    private List<LatLng> markers = new ArrayList<>();
-    private  List<GpsWaypoint> waypoints = new ArrayList<>();
-    private List<PressureData> pressureValues = new ArrayList<>();
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final List<LatLng> markers = new ArrayList<>();
+    private final List<GpsWaypoint> waypoints = new ArrayList<>();
+    private final List<PressureData> pressureValues = new ArrayList<>();
+    private Button stopButton;
 
     private static FragmentMaps INSTANCE = null;
 
@@ -55,34 +41,18 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Maps.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FragmentMaps newInstance(String param1, String param2) {
         FragmentMaps fragment = new FragmentMaps();
         Bundle args = new Bundle();
-
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("param1", param1);
+        args.putString("param2", param2);
         fragment.setArguments(args);
         return fragment;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
         INSTANCE = this;
     }
 
@@ -92,8 +62,9 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        stopButton = view.findViewById(R.id.button4);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
@@ -106,14 +77,9 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         SharedViewmodel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewmodel.class);
-        Log.d(TAG, "onMapReady: MapReady");
+        Log.d(TAG, "onMapReady: Map is ready");
 
         mMap = googleMap;
 
@@ -122,19 +88,22 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             GpsWaypoint waypoint = data.getGpsWaypoint();
             PressureData pressureData = data.getPressureData();
 
-            if(waypoint != null)
-            {
+            if (waypoint != null) {
+                Log.d(TAG, "Received waypoint: " + waypoint.getLatitude() + ", " + waypoint.getLongitude());
+
                 GpsWaypoint newWaypoint = new GpsWaypoint();
                 newWaypoint.setTimeStamp(waypoint.getTimeStamp());
                 newWaypoint.setLatitude(waypoint.getLatitude());
                 newWaypoint.setLongitude(waypoint.getLongitude());
 
-                if(waypoints.isEmpty() || waypoints.get(waypoints.size()-1).getTimeStamp() != waypoint.getTimeStamp())
+                if (waypoints.isEmpty() || waypoints.get(waypoints.size() - 1).getTimeStamp() != waypoint.getTimeStamp()) {
                     waypoints.add(newWaypoint);
+                }
             }
 
-            if(pressureData != null)
-            {
+            if (pressureData != null) {
+                Log.d(TAG, "Received pressure data: " + pressureData.getPressureValue());
+
                 PressureData newPressureData = new PressureData();
                 newPressureData.setPressureValue(pressureData.getPressureValue());
                 newPressureData.setTimeStamp(pressureData.getTimeStamp());
@@ -142,77 +111,77 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                 pressureValues.add(newPressureData);
             }
 
-            if (waypoint != null) {
-                if (mMap != null) {
-                    if (waypoints.isEmpty() || waypoints.get(waypoints.size() - 1).getTimeStamp() != waypoint.getTimeStamp()) {
-                        LatLng firstMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 17));
-                        //Log.d(TAG, "onMapReady: Primul punct: " + firstMarker);
-                    }
+            if (!waypoints.isEmpty()) {
 
-                    for (int i = 0; i < waypoints.size(); i++) {
+                for (int i = 0; i < waypoints.size(); i++) {
+                    if (i > 0) {
+                        LatLng start = new LatLng(waypoints.get(i - 1).getLatitude(), waypoints.get(i - 1).getLongitude());
+                        LatLng end = new LatLng(waypoints.get(i).getLatitude(), waypoints.get(i).getLongitude());
 
-                        LatLng marker = new LatLng(waypoints.get(i).getLatitude(), waypoints.get(i).getLongitude());
-                        markers.add(marker);
+                        long startTimestamp = waypoints.get(i - 1).getTimeStamp();
+                        long endTimestamp = waypoints.get(i).getTimeStamp();
 
-                        if (i > 0) {
-                            LatLng previousMarker = new LatLng(waypoints.get(i - 1).getLatitude(), waypoints.get(i - 1).getLongitude());
-                            LatLng start = new LatLng(waypoints.get(i - 1).getLatitude(), waypoints.get(i - 1).getLongitude());
-                            LatLng end = new LatLng(waypoints.get(i).getLatitude(), waypoints.get(i).getLongitude());
-                            //Log.d(TAG, markers.toString());
+                        long pressureValueBetweenTwoPoints = 0;
+                        int count = 0;
 
-                            if (waypoints.get(i).getTimeStamp() >= pressureData.getTimeStamp() && pressureData.getTimeStamp() >= waypoints.get(i - 1).getTimeStamp()) {
-                                Log.d(TAG, "onMapReady: primul waypoint " + waypoints.get(i - 1).getTimeStamp());
-                                Log.d(TAG, "onMapReady: al doilea waypoint " + waypoints.get(i).getTimeStamp());
-
-                                long startTimestamp = waypoints.get(i - 1).getTimeStamp();
-                                long endTimestamp = waypoints.get(i).getTimeStamp();
-
-                                long sum = 0;
-                                int count = 0;
-
-                                for (PressureData pressure : pressureValues) { // Iterează prin lista de obiecte PressureData
-                                    if (pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp) {
-                                        Log.d(TAG, "Using pressure value: " + pressure.getPressureValue() + " with timestamp: " + pressure.getTimeStamp());
-                                        sum += pressure.getPressureValue();
-                                        count++;
-                                    }
-                                }
-
-                                long averagePressure = (count >0) ? sum/count : 0;
-                                PressureData averagePressureData = new PressureData();
-                                averagePressureData.setPressureValue(averagePressure);
-
-                                // Determină culoarea segmentului
-                                int segmentColor = (count > 0) ? averagePressureData.getSegmentColor() : Color.GRAY;
-                                Log.d(TAG, "Average pressure: " + averagePressure);
-                                Log.d(TAG, "Segment color: " + segmentColor);
-
-                                // Desenează linia pe hartă
-                                mMap.addPolyline(new PolylineOptions()
-                                        .clickable(true)
-                                        .add(start, end)
-                                        .color(segmentColor)
-                                        .width(5));
+                        for (PressureData pressure : pressureValues) {
+                            if (pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp) {
+                                pressureValueBetweenTwoPoints += pressure.getPressureValue();
+                                count++;
                             }
-
-                            //Log.d(TAG, "onMapReady: TimeStamp: " + waypoints.get(i).getTimeStamp());
-
-                            if (!marker.equals(previousMarker))
-                            {
-                                mMap.addMarker(new MarkerOptions().position(marker).title("Marker " + (i + 1)));
-                            }
-                            else
-                            {
-                                //Log.e(TAG, "Duplicate marker at index " + i);
-                            }
-                        } else
-                        {
-                            LatLng defaultMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(defaultMarker).title("Marker 1"));
                         }
+
+                        long averagePressureBetweenTwoPoints = pressureValueBetweenTwoPoints / count;
+
+                        if (pressureData != null) {
+                            pressureData.setPressureValue(averagePressureBetweenTwoPoints);
+                        }
+
+                        int segmentColor = (count > 0) ? pressureData.getSegmentColor() : Color.GRAY;
+                        Log.d(TAG, "onMapReady: Segment color " + segmentColor);
+
+                        if (mMap != null) {
+                            mMap.addPolyline(new PolylineOptions()
+                                    .clickable(true)
+                                    .add(start, end)
+                                    .color(segmentColor)
+                                    .width(5));
+                        }
+                        Log.d(TAG, "Pressure values remaining: " + pressureValues.size());
+
+                        pressureValues.removeIf(pressure -> pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp);
                     }
+
+                    if (i < waypoints.size() - 1)
+                    {
+                        waypoints.remove(i - 1);
+                        Log.d(TAG, "Waypoint removed: " + (i - 1));
+                        i--;
+                    }
+
+                    Log.d(TAG, "Remaining waypoints: " + waypoints.size());
+                    Log.d(TAG, "Remaining pressures: " + pressureValues.size());
                 }
+            }
+        });
+
+        if(!waypoints.isEmpty())
+        {
+            LatLng firstMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
+                mMap.addMarker(new MarkerOptions().position(firstMarker).title("Start"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
+                markers.add(firstMarker);
+            Log.d(TAG, "onMapReady: IT ENTERED FIRST MARKER IF");
+        }
+
+        stopButton.setOnClickListener(view -> {
+
+            LatLng finishMarker = new LatLng(waypoints.get(waypoints.size() - 1).getLatitude(), waypoints.get(waypoints.size() - 1).getLongitude());
+            Log.d(TAG, "onMapReady: Button pressed");
+            if (!markers.contains(finishMarker) && ConnectionManager.getInstance() != null) {
+                mMap.addMarker(new MarkerOptions().position(finishMarker).title("Finish"));
+                markers.add(finishMarker);
+                ConnectionManager.getInstance().stopReading();
             }
         });
     }

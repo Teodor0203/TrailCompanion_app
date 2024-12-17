@@ -2,8 +2,6 @@ package com.example.testing;
 
 import android.graphics.Color;
 
-import androidx.annotation.NonNull;
-
 public class PressureData {
 
     private long pressureValue, timeStamp;
@@ -25,14 +23,14 @@ public class PressureData {
 
     public int getSegmentColor()
     {
-        if (pressureValue > 0 && pressureValue <= 500) {
+        if (pressureValue >= 0 && pressureValue <= 500) {
             segmentColor = Color.parseColor("#ff35c025"); // Verde
         } else if (pressureValue > 500 && pressureValue <= 1000) {
             segmentColor = Color.parseColor("#ffece816"); // Galben
         } else if (pressureValue > 1000 && pressureValue <= 1500) {
             segmentColor = Color.parseColor("#ffec8716"); // Portocaliu
         } else if(pressureValue > 1800){
-            segmentColor = Color.parseColor("#ffda2424"); // Roșu
+            segmentColor = Color.parseColor("#ffda2424");
         }
 
         return segmentColor;

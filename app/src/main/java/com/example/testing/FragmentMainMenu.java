@@ -1,18 +1,16 @@
 package com.example.testing;
 
-import android.health.connect.datatypes.units.Pressure;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,6 +77,7 @@ public class FragmentMainMenu extends Fragment {
 
         goButton.setOnClickListener(view1 -> {
 
+            ConnectionManager.getInstance().startReading();
             if (ConnectionManager.getInstance().isConnected())
             {
                 Log.d(TAG, "onViewCreated: Connected");
@@ -138,7 +137,7 @@ public class FragmentMainMenu extends Fragment {
                     R.anim.fade_out,
                     R.anim.fade_in,
                     R.anim.slide_in
-            ).replace(R.id.main_menu_fragment, new FragmentMaps()).commit();
+            ).replace(R.id.main_menu_fragment, new FragmentMaps()).addToBackStack(null).commit();
         });
     }
 }

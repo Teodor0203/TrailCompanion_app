@@ -6,22 +6,13 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
 public class RFP602 extends Sensor {
 
     private final String TAG = "RFP602";
     private PressureData pressureData;
     private Context context;
 
-    public RFP602(String sensorType, boolean isActive, Context context)
-    {
+    public RFP602(String sensorType, boolean isActive, Context context) {
         super(sensorType, isActive);
         this.context = context;
     }
@@ -33,11 +24,9 @@ public class RFP602 extends Sensor {
 
     @Override
     public void readData(String jsonData) {
-        try
-        {
+        try {
             JSONObject jsonObject = new JSONObject(jsonData);
-            if (jsonObject.getString("sensorType").equals(getSensorType()))
-            {
+            if (jsonObject.getString("sensorType").equals(getSensorType())) {
                 JSONObject data = jsonObject.getJSONObject("dataRFP602");
                 long analogPressureValue = data.getLong("analogPressureValue");
                 long timeStamp = jsonObject.getLong("timeStamp");
@@ -62,12 +51,9 @@ public class RFP602 extends Sensor {
                 }*/
 
                 Log.d("FragmentMainMenu", "readData: " + timeStamp + ": " + analogPressureValue);
-            }
-            else
+            } else
                 Log.d(TAG, "Couldn't read data");
-        }
-        catch (org.json.JSONException e)
-        {
+        } catch (org.json.JSONException e) {
             Log.d(TAG, "Error parsing JSON: " + e.getMessage());
             e.printStackTrace();
             Log.d(TAG, "readData: Invalid JSON format!");
@@ -79,8 +65,7 @@ public class RFP602 extends Sensor {
     }
 
     @Override
-    public void saveDataToFile(String jsonData)
-    {
+    public void saveDataToFile(String jsonData) {
         super.saveDataToFile(jsonData);
     }
 }

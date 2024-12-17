@@ -5,28 +5,23 @@ import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 
-public class DHT11 extends Sensor{
+public class DHT11 extends Sensor {
 
     private final String TAG = "DHT11";
 
-    public DHT11(String sensorType, boolean isActive)
-    {
+    public DHT11(String sensorType, boolean isActive) {
         super(sensorType, isActive);
     }
 
     @Override
-    public void readData(String jsonData, TextView textView)
-    {
-        try
-        {
+    public void readData(String jsonData, TextView textView) {
+        try {
             JSONObject jsonObject = new JSONObject(jsonData);
 
-            if (jsonObject.getString("sensorType").equals(getSensorType()))
-            {
+            if (jsonObject.getString("sensorType").equals(getSensorType())) {
                 DecimalFormat formatDouble = new DecimalFormat("#.00");
 
                 JSONObject dataFromDHT11 = jsonObject.getJSONObject("dataDHT11");
@@ -36,14 +31,12 @@ public class DHT11 extends Sensor{
                 String temperatureFormated = formatDouble.format(feelTemperature);
 
                 Log.d(TAG, "readData: " + temperature + feelTemperature);
-                textView.setText("Temperature: " + temperatureFormated  + " GRADEEEE" + "\n" + humidity );
+                textView.setText("Temperature: " + temperatureFormated + " GRADEEEE" + "\n" + humidity);
             }
-        }
-        catch (JSONException e)
-        {
+        } catch (JSONException e) {
             Log.d(TAG, "Error parsing JSON: " + e.getMessage());
             e.printStackTrace();
-            Log.d(TAG, "Invalid JSON format!") ;
+            Log.d(TAG, "Invalid JSON format!");
         }
     }
 
@@ -53,8 +46,7 @@ public class DHT11 extends Sensor{
     }
 
     @Override
-    public void saveDataToFile(String jsonData)
-    {
+    public void saveDataToFile(String jsonData) {
         super.saveDataToFile(jsonData);
     }
 }

@@ -1,8 +1,5 @@
 package com.example.testing;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -12,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -22,18 +18,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
-public class ConnectionManager implements DataCallback{
+public class ConnectionManager implements DataCallback {
 
     //region TAG and UUID
     private final String TAG = "ConnectionManager";
@@ -60,8 +50,7 @@ public class ConnectionManager implements DataCallback{
     private Button startButton;
     //endregion
 
-    public ConnectionManager(Context context, ProgressBar progressBar, TextView textView, Button startButton)
-    {
+    public ConnectionManager(Context context, ProgressBar progressBar, TextView textView, Button startButton) {
         this.context = context;
         this.progressBar = progressBar;
         this.textView = textView;
@@ -69,32 +58,27 @@ public class ConnectionManager implements DataCallback{
         checkIfBluetoothIsSupported();
     }
 
-    public ConnectionManager()
-    {
+    public ConnectionManager() {
         checkIfBluetoothIsSupported();
     }
 
-    public static ConnectionManager getInstance()
-    {
-        if(INSTACE == null)
-        {
+    public static ConnectionManager getInstance() {
+        if (INSTACE == null) {
             INSTACE = new ConnectionManager();
         }
 
         return INSTACE;
     }
-    public static ConnectionManager getInstance(Context context, ProgressBar progressBar, TextView textView, Button startButton)
-    {
-        if(INSTACE == null)
-        {
+
+    public static ConnectionManager getInstance(Context context, ProgressBar progressBar, TextView textView, Button startButton) {
+        if (INSTACE == null) {
             INSTACE = new ConnectionManager(context, progressBar, textView, startButton);
         }
 
         return INSTACE;
     }
 
-    public void checkIfBluetoothIsSupported()
-    {
+    public void checkIfBluetoothIsSupported() {
         if (adapter == null) {
             Toast.makeText(context, "Bluetooth is not supported!!", Toast.LENGTH_LONG).show();
         }
@@ -130,21 +114,18 @@ public class ConnectionManager implements DataCallback{
     }
 
     @SuppressLint("MissingPermission")
-    public void disableBluetooth()
-    {
-        if (adapter.isEnabled())
-        {
+    public void disableBluetooth() {
+        if (adapter.isEnabled()) {
             adapter.disable();
             Log.d(TAG, "onDisable: Disabling bluetooth");
             Toast.makeText(context, "Bluetooth disabled", Toast.LENGTH_SHORT).show();
         }
-            Log.d(TAG, "onEnable: already enabled");
+        Log.d(TAG, "onEnable: already enabled");
     }
 
     //region Show devices list, maybe I will need it one day
     @SuppressLint("MissingPermission")
-    public void showConnectedDevices(TextView textView)
-    {
+    public void showConnectedDevices(TextView textView) {
         if (isListVisible) {
             textView.setText("");
             Log.d(TAG, "hideList: List hidden");
@@ -169,83 +150,71 @@ public class ConnectionManager implements DataCallback{
     }
 
     @SuppressLint("MissingPermission")
-    public void connectToESP()
-    {
+    public void connectToESP() {
         String targetDeviceName = "ESP32";
         final BluetoothDevice[] device = {null};
 
-        if (adapter.isDiscovering())
-        {
+        if (adapter.isDiscovering()) {
             Log.d(TAG, "connectToESP: Starts descovering");
             adapter.cancelDiscovery();
         }
         adapter.startDiscovery();
 
-        BroadcastReceiver receiver = new BroadcastReceiver()
-        {
+        BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
-            public void onReceive(Context context, Intent intent)
-            {
+            public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
 
-                if(progressBar != null)
+                if (progressBar != null)
                 {
                     progressBar.setVisibility(View.VISIBLE);
                 }
-                if(textView !=null)
+                if (textView != null)
+                {
                     textView.setText("");
+                }
 
                 if (BluetoothDevice.ACTION_FOUND.equals(action))
                 {
                     BluetoothDevice foundDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    if (foundDevice != null && targetDeviceName.equals(foundDevice.getName()))
-                    {
+                    if (foundDevice != null && targetDeviceName.equals(foundDevice.getName())) {
                         device[0] = foundDevice;
-                        adapter.cancelDiscovery(); // Oprește descoperirea
-                        context.unregisterReceiver(this); // Deregistrează receiver-ul
-                        connectToDevice(device[0]); // Conectează-te la dispozitiv
+                        adapter.cancelDiscovery();
+                        context.unregisterReceiver(this);
+                        connectToDevice(device[0]);
 
-                        if(progressBar != null)
-                        {
+                        if (progressBar != null) {
                             progressBar.setVisibility(View.INVISIBLE);
                         }
 
-                        if(textView != null)
-                        {
+                        if (textView != null) {
                             textView.setText("Device connected" + "\n" + ":)");
                         }
 
-                        if(startButton != null)
-                        {
+                        if (startButton != null) {
                             startButton.setVisibility(View.VISIBLE);
                         }
 
                         ((Activity) context).runOnUiThread(() ->
-                            Toast.makeText(context, "Connected to " + foundDevice.getName(), Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Connected to " + foundDevice.getName(), Toast.LENGTH_SHORT).show()
                         );
                     }
-                }
-                else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
-                {
-                    if (device[0] == null)
-                    {
-                        if(progressBar != null)
-                        {
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                    if (device[0] == null) {
+                        if (progressBar != null) {
                             progressBar.setVisibility(View.INVISIBLE);
                         }
 
-                        if(textView != null)
-                        {
-                            textView.setText("Device not found"  + "\n" + ":(");
+                        if (textView != null) {
+                            textView.setText("Device not found" + "\n" + ":(");
                         }
 
-                        if(startButton != null)
-                        {
+                        if (startButton != null) {
                             startButton.setVisibility(View.INVISIBLE);
                         }
 
                         ((Activity) context).runOnUiThread(() ->
-                                Toast.makeText(context, "Device not found", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Device not found", Toast.LENGTH_SHORT).show()
                         );
                         Log.d(TAG, "connectToESP: Device not found during discovery");
                     }
@@ -283,30 +252,31 @@ public class ConnectionManager implements DataCallback{
         }
     }
 
-    public void disconnect()
-    {
-        try
-        {
-            if (bluetoothSocket != null)
-            {
+    public void disconnect() {
+        try {
+            if (bluetoothSocket != null) {
                 bluetoothSocket.close();
                 Log.d(TAG, "Disconnected");
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             Log.e(TAG, "Error closing connection: " + e.getMessage());
         }
     }
 
-    public void readData(DataCallback callback)  {
-        new Thread(() -> {
+    private volatile boolean shouldStop = false; // Variabila de control
 
+    public void readData(DataCallback callback) {
+
+        new Thread(() -> {
             StringBuilder dataBuilder = new StringBuilder();
             try {
                 byte[] buffer = new byte[1024];
                 int bytes;
                 while ((bytes = inputStream.read(buffer)) != -1) {
+                    if (shouldStop) {
+                        break; // Oprește citirea dacă flag-ul `shouldStop` este activat
+                    }
+
                     String data = new String(buffer, 0, bytes);
                     dataBuilder.append(data);
                     handler.post(() -> {
@@ -315,7 +285,8 @@ public class ConnectionManager implements DataCallback{
                         }
                     });
                 }
-                if (callback != null) {
+
+                if (!shouldStop && callback != null) {
                     handler.post(() -> callback.onDataReceived(dataBuilder.toString()));
                 }
             } catch (Exception e) {
@@ -323,6 +294,16 @@ public class ConnectionManager implements DataCallback{
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public void stopReading() {
+        shouldStop = true;
+        Log.d("FragmentMaps", "stopReading: READING STOPPED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
+    }
+
+    public void startReading() {
+        shouldStop = false;
+        Log.d("FragmentMaps", "stopReading: READING STARTED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
     }
 
     @Override

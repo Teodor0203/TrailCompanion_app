@@ -1,5 +1,7 @@
 package com.example.testing;
 
+import java.util.Objects;
+
 public class GpsWaypoint {
 
     private double latitude;
