@@ -11,7 +11,6 @@ public class SharedViewmodel extends ViewModel {
     private final String TAG = "SharedViewModel";
     private final MutableLiveData<Data> dataLiveData = new MutableLiveData<>();
 
-
     public LiveData<Data> getDataLiveData() {
         return dataLiveData;
     }

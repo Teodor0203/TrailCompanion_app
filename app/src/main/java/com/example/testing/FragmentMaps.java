@@ -152,6 +152,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                         pressureValues.removeIf(pressure -> pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp);
                     }
 
+                    //Append nu imi umple buffer-ul!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                     if (i < waypoints.size() - 1)
                     {
                         waypoints.remove(i - 1);
