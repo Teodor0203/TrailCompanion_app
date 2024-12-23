@@ -1,5 +1,6 @@
 package com.example.testing;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,6 +25,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +41,7 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     private final List<LatLng> markers = new ArrayList<>();
     private final List<GpsWaypoint> waypoints = new ArrayList<>();
     private final List<PressureData> pressureValues = new ArrayList<>();
+    private static int index = 1;
     private Button stopButton;
 
     private static FragmentMaps INSTANCE = null;
@@ -54,6 +63,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         INSTANCE = this;
+
+
     }
 
     public static FragmentMaps getInstance() {
@@ -87,6 +98,14 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
             GpsWaypoint waypoint = data.getGpsWaypoint();
             PressureData pressureData = data.getPressureData();
+            GpsData gpsData = data.getGpsData();
+
+            TextView speedometer = getView().findViewById(R.id.textView2);
+
+            if(speedometer != null && gpsData != null)
+            {
+                speedometer.setText(gpsData.toString());
+            }
 
             if (waypoint != null) {
                 Log.d(TAG, "Received waypoint: " + waypoint.getLatitude() + ", " + waypoint.getLongitude());
@@ -98,6 +117,37 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
                 if (waypoints.isEmpty() || waypoints.get(waypoints.size() - 1).getTimeStamp() != waypoint.getTimeStamp()) {
                     waypoints.add(newWaypoint);
+
+                    if (waypoints.size() == 1)
+                    {
+                        LatLng firstMarker = new LatLng(newWaypoint.getLatitude(), newWaypoint.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(firstMarker).title("Start"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
+                        markers.add(firstMarker);
+                        Log.d(TAG, "First waypoint added and marker set");
+                    }
+
+                    File file = new File(getContext().getFilesDir(), "waypoints" + index + ".csv");
+                    boolean isNewFIle = !file.exists();
+
+                    try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true))))
+                    {
+
+                        if(isNewFIle)
+                        {
+                            writer.write("TIMESTAMP, LATITUDE, LONGITUDE\n");
+                        }
+
+                        writer.write(newWaypoint.toString());
+                        writer.newLine();
+                        writer.flush();
+                        Log.d(TAG, "onMapReady: Saved to file");
+
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -131,13 +181,13 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                             }
                         }
 
-                        long averagePressureBetweenTwoPoints = pressureValueBetweenTwoPoints / count;
+                        long averagePressureBetweenTwoPoints = (count > 0) ? (pressureValueBetweenTwoPoints / count) : 0;
 
                         if (pressureData != null) {
                             pressureData.setPressureValue(averagePressureBetweenTwoPoints);
                         }
 
-                        int segmentColor = (count > 0) ? pressureData.getSegmentColor() : Color.GRAY;
+                        int segmentColor = pressureData.getSegmentColor();
                         Log.d(TAG, "onMapReady: Segment color " + segmentColor);
 
                         if (mMap != null) {
@@ -154,7 +204,7 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
                     //Append nu imi umple buffer-ul!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                    if (i < waypoints.size() - 1)
+                    if (i < waypoints.size() - 1 && i>0)
                     {
                         waypoints.remove(i - 1);
                         Log.d(TAG, "Waypoint removed: " + (i - 1));
@@ -170,21 +220,61 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
         if(!waypoints.isEmpty())
         {
             LatLng firstMarker = new LatLng(waypoints.get(0).getLatitude(), waypoints.get(0).getLongitude());
-                mMap.addMarker(new MarkerOptions().position(firstMarker).title("Start"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
-                markers.add(firstMarker);
+            mMap.addMarker(new MarkerOptions().position(firstMarker).title("Start"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
+            markers.add(firstMarker);
             Log.d(TAG, "onMapReady: IT ENTERED FIRST MARKER IF");
         }
 
         stopButton.setOnClickListener(view -> {
 
-            LatLng finishMarker = new LatLng(waypoints.get(waypoints.size() - 1).getLatitude(), waypoints.get(waypoints.size() - 1).getLongitude());
-            Log.d(TAG, "onMapReady: Button pressed");
-            if (!markers.contains(finishMarker) && ConnectionManager.getInstance() != null) {
-                mMap.addMarker(new MarkerOptions().position(finishMarker).title("Finish"));
-                markers.add(finishMarker);
-                ConnectionManager.getInstance().stopReading();
+            if(!waypoints.isEmpty())
+            {
+                LatLng finishMarker = new LatLng(waypoints.get(waypoints.size() - 1).getLatitude(), waypoints.get(waypoints.size() - 1).getLongitude());
+                Log.d(TAG, "onMapReady: Button pressed");
+                if (!markers.contains(finishMarker) && ConnectionManager.getInstance() != null) {
+                    mMap.addMarker(new MarkerOptions().position(finishMarker).title("Finish"));
+                    markers.add(finishMarker);
+                    ConnectionManager.getInstance().stopReading();
+
+                    //showSaveDialog();
+                }
             }
         });
+    }
+
+    private void showSaveDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Save Trail")
+                .setMessage("Do you want to save this trail?")
+                .setPositiveButton("Yes", (dialog, which) -> saveTrail())
+                .setNegativeButton("No", (dialog, which) -> deleteTemporaryFiles())
+                .show();
+    }
+
+    private void saveTrail() {
+        File waypointsFile = new File(getContext().getFilesDir(), "waypoints.csv");
+        File pressuresFile = new File(getContext().getFilesDir(), "pressures.csv");
+
+        File newWaypointsFile = new File(getContext().getFilesDir(), "waypoints" + index + ".csv");
+        File newTrailFile = new File(getContext().getFilesDir(), "trail" + index + ".csv");
+
+        if (waypointsFile.exists()) {
+            waypointsFile.renameTo(newWaypointsFile);
+        }
+        if (pressuresFile.exists()) {
+            pressuresFile.renameTo(newTrailFile);
+        }
+
+        Log.d("FragmentMaps", "Trail saved as trail" + index + ".csv and waypoints" + index + ".csv");
+        index++;
+    }
+
+    private void deleteTemporaryFiles() {
+        File waypointsFile = new File(getContext().getFilesDir(), "waypoints.csv");
+
+        if (waypointsFile.exists()) waypointsFile.delete();
+
+        Log.d("FragmentMaps", "Temporary files deleted");
     }
 }

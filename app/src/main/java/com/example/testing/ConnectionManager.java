@@ -89,9 +89,8 @@ public class ConnectionManager implements DataCallback {
         if (!adapter.isEnabled()) {
             Log.d(TAG, "onEnable: Enabling bluetooth");
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(intent, 1); // Request code pentru activare Bluetooth
+            activity.startActivityForResult(intent, 1);
 
-            // Înregistrăm un receiver pentru a detecta când Bluetooth-ul a fost activat
             BroadcastReceiver receiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -103,7 +102,7 @@ public class ConnectionManager implements DataCallback {
                             ((Activity) context).runOnUiThread(() ->
                                     Toast.makeText(context, "Looking for device!", Toast.LENGTH_LONG).show()
                             );
-                            connectToESP(); // Apelează după ce Bluetooth-ul este activat
+                            connectToESP();
                         }
                     }
                 }
@@ -149,6 +148,19 @@ public class ConnectionManager implements DataCallback {
         return bluetoothSocket != null && bluetoothSocket.isConnected();
     }
 
+    public void disconnect() {
+        try {
+            if (bluetoothSocket != null) {
+                bluetoothSocket.close();
+                bluetoothSocket = null;
+                isConnected = false;
+                Log.d(TAG, "Disconnected");
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error closing connection: " + e.getMessage());
+        }
+    }
+
     @SuppressLint("MissingPermission")
     public void connectToESP() {
         String targetDeviceName = "ESP32";
@@ -160,31 +172,32 @@ public class ConnectionManager implements DataCallback {
         }
         adapter.startDiscovery();
 
+        if (progressBar != null)
+        {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        if (textView != null) {
+            textView.setText(""); // Resetează textul
+        }
+
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
 
-                if (progressBar != null)
-                {
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-                if (textView != null)
-                {
-                    textView.setText("");
-                }
-
-                if (BluetoothDevice.ACTION_FOUND.equals(action))
-                {
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     BluetoothDevice foundDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     if (foundDevice != null && targetDeviceName.equals(foundDevice.getName())) {
                         device[0] = foundDevice;
                         adapter.cancelDiscovery();
                         context.unregisterReceiver(this);
+
+                        // Conectează-te la dispozitiv
                         connectToDevice(device[0]);
 
                         if (progressBar != null) {
-                            progressBar.setVisibility(View.INVISIBLE);
+                            progressBar.setVisibility(View.INVISIBLE); // Ascunde progres bar
                         }
 
                         if (textView != null) {
@@ -192,7 +205,7 @@ public class ConnectionManager implements DataCallback {
                         }
 
                         if (startButton != null) {
-                            startButton.setVisibility(View.VISIBLE);
+                            startButton.setVisibility(View.VISIBLE); // Arată butonul
                         }
 
                         ((Activity) context).runOnUiThread(() ->
@@ -201,8 +214,9 @@ public class ConnectionManager implements DataCallback {
                     }
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                     if (device[0] == null) {
+                        // Dispozitivul nu a fost găsit
                         if (progressBar != null) {
-                            progressBar.setVisibility(View.INVISIBLE);
+                            progressBar.setVisibility(View.INVISIBLE); // Ascunde progres bar
                         }
 
                         if (textView != null) {
@@ -210,15 +224,14 @@ public class ConnectionManager implements DataCallback {
                         }
 
                         if (startButton != null) {
-                            startButton.setVisibility(View.INVISIBLE);
+                            startButton.setVisibility(View.INVISIBLE); // Ascunde butonul
                         }
 
                         ((Activity) context).runOnUiThread(() ->
                                 Toast.makeText(context, "Device not found", Toast.LENGTH_SHORT).show()
                         );
-                        Log.d(TAG, "connectToESP: Device not found during discovery");
                     }
-                    context.unregisterReceiver(this); // Deregistrează receiver-ul
+                    context.unregisterReceiver(this);
                 }
             }
         };
@@ -229,9 +242,13 @@ public class ConnectionManager implements DataCallback {
         context.registerReceiver(receiver, filter);
     }
 
-
     @SuppressLint("MissingPermission")
     private void connectToDevice(BluetoothDevice device) {
+
+        if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
+            disconnect();
+        }
+
         try {
             bluetoothSocket = device.createRfcommSocketToServiceRecord(SPP_UUID);
             bluetoothSocket.connect();
@@ -244,6 +261,20 @@ public class ConnectionManager implements DataCallback {
             }
         } catch (IOException e) {
             Log.e(TAG, "Error connecting to device: " + e.getMessage());
+
+            // Actualizări UI în caz de eroare
+            if (progressBar != null) {
+                progressBar.setVisibility(View.INVISIBLE); // Ascunde progres bar
+            }
+
+            if (textView != null) {
+                textView.setText("Connection failed" + "\n" + ":(");
+            }
+
+            if (startButton != null) {
+                startButton.setVisibility(View.INVISIBLE); // Ascunde butonul
+            }
+
             try {
                 bluetoothSocket.close();
             } catch (IOException closeException) {
@@ -252,18 +283,7 @@ public class ConnectionManager implements DataCallback {
         }
     }
 
-    public void disconnect() {
-        try {
-            if (bluetoothSocket != null) {
-                bluetoothSocket.close();
-                Log.d(TAG, "Disconnected");
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Error closing connection: " + e.getMessage());
-        }
-    }
-
-    private volatile boolean shouldStop = false; // Variabila de control
+    private volatile boolean shouldStop = false;
 
     public void readData(DataCallback callback) {
 
@@ -298,6 +318,7 @@ public class ConnectionManager implements DataCallback {
 
     public void stopReading() {
         shouldStop = true;
+        disconnect();
         Log.d("FragmentMaps", "stopReading: READING STOPPED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
     }
 

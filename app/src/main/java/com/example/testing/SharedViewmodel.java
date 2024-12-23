@@ -23,7 +23,7 @@ public class SharedViewmodel extends ViewModel {
         Data currentData = dataLiveData.getValue();
 
         if (currentData == null) {
-            currentData = new Data(null, null);
+            currentData = new Data(null, null, null);
         }
 
         currentData.setGpsWaypoint(gpsWaypoint);
@@ -35,10 +35,23 @@ public class SharedViewmodel extends ViewModel {
         Data currentData = dataLiveData.getValue();
 
         if (currentData == null) {
-            currentData = new Data(null, null);
+            currentData = new Data(null, null, null);
         }
 
         currentData.setPressureData(pressureData);
+        dataLiveData.setValue(currentData);
+        Log.d(TAG, "onViewCreated: PressureDataUpdated");
+    }
+
+    public void updateGpsData(GpsData gpsData)
+    {
+        Data currentData = dataLiveData.getValue();
+
+        if (currentData == null) {
+            currentData = new Data(null, null, null);
+        }
+
+        currentData.setGpsData(gpsData);
         dataLiveData.setValue(currentData);
         Log.d(TAG, "onViewCreated: PressureDataUpdated");
     }

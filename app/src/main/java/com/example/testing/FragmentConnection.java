@@ -13,6 +13,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,8 +26,13 @@ import androidx.fragment.app.Fragment;
  */
 public class FragmentConnection extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private NEO6M gpsModule;
+    private DHT11 dht11Sensor;
+    private RFP602 rfp602sensor;
+    private GpsWaypoint gpsWaypoint;
+    private GpsData gpsdata;
+    private PressureData pressureData;
+    private final String TAG = "FragmentConnection";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -65,6 +75,12 @@ public class FragmentConnection extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        gpsModule = new NEO6M("NEO6M", true);
+        dht11Sensor = new DHT11("DHT11", true);
+        rfp602sensor = new RFP602("RFP602", true, getContext());
+
+
         return inflater.inflate(R.layout.fragment_connection, container, false);
     }
 
@@ -72,13 +88,17 @@ public class FragmentConnection extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        TextView speedometer = view.findViewById(R.id.textView2);
+        Button startButton = view.findViewById(R.id.button2);
+
         TextView deviceConected = view.findViewById(R.id.textView4);
         Button connectDevice = view.findViewById(R.id.button);
-        Button startButton = view.findViewById(R.id.button2);
+
         ProgressBar loadingConnetion = view.findViewById(R.id.progressBar);
         loadingConnetion.getIndeterminateDrawable().setColorFilter(Color.GRAY, android.graphics.PorterDuff.Mode.MULTIPLY);
         loadingConnetion.setVisibility(View.INVISIBLE);
 
+        SharedViewmodel sharedViewmodel = new ViewModelProvider(requireActivity()).get(SharedViewmodel.class);
 
         if (startButton != null) {
             startButton.setVisibility(View.INVISIBLE);
@@ -89,20 +109,73 @@ public class FragmentConnection extends Fragment {
             ConnectionManager.getInstance(getActivity(), loadingConnetion, deviceConected, startButton).connectToESP();
         });
 
-        startButton.setOnClickListener(v -> {
-            Log.d("ConnectionManager", "onCreate: StartButton clicked");
+        startButton.setOnClickListener(view1 -> {
 
-            if (view.findViewById(R.id.rootContainer) == null) {
-                Log.e("Debug", "rootContainer nu este găsit!");
-            } else {
-                Log.d("Debug", "rootContainer este prezent.");
+            ConnectionManager.getInstance().startReading();
+            if (ConnectionManager.getInstance().isConnected())
+            {
+                Log.d(TAG, "onViewCreated: Connected");
+                ConnectionManager.getInstance().readData(data -> {
+                    if(data != null && !data.isEmpty())
+                    {
+                        String[] messages = data.split("\n");
+                        for(String message : messages)
+                        {
+                            try
+                            {
+                                JSONObject jsonData = new JSONObject(message);
+                                String sensorType = jsonData.getString("sensorType");
+
+                                if(dht11Sensor.getSensorType().equals(sensorType))
+                                {
+                                    dht11Sensor.readData(jsonData.toString());
+                                    Log.d(TAG, "onViewCreated: Reading DHT");
+                                }
+                                else if (rfp602sensor.getSensorType().equals(sensorType))
+                                {
+                                    rfp602sensor.readData(jsonData.toString());
+
+                                    pressureData = rfp602sensor.getPressureData();
+
+                                    sharedViewmodel.updatePressureData(pressureData);
+                                }
+                                else if(gpsModule.getSensorType().equals(sensorType))
+                                {
+                                    gpsModule.readData(jsonData.toString());
+
+                                    gpsWaypoint = gpsModule.getWaypoint();
+
+                                    gpsdata = gpsModule.getGpsData();
+
+                                    sharedViewmodel.updateGpsData(gpsdata);
+
+                                    sharedViewmodel.updateGpsWaypoint(gpsWaypoint);
+
+                                    Log.d(TAG, "onViewCreated: " + gpsModule.getWaypoint().toString());
+                                }
+                            }
+                            catch (JSONException e)
+                            {
+                                Log.d(TAG, "Error parsing JSON message: " + message);
+                            }
+                        }
+                    }
+                    else {
+                        Log.d(TAG, "Data is null or empty");
+                    }
+                });
             }
+            else
+            {
+                Log.d(TAG, "onViewCreated: Nu este");
+            }
+
             getParentFragmentManager().beginTransaction().setCustomAnimations(
                     R.anim.slide_in,
                     R.anim.fade_out,
                     R.anim.fade_in,
                     R.anim.slide_in
-            ).replace(R.id.rootContainer, new FragmentMainMenu()).commit();
+            ).replace(R.id.rootContainer, new FragmentMaps()).commit();
         });
     }
 }

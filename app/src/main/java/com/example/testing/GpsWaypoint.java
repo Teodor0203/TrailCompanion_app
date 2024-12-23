@@ -31,6 +31,6 @@ public class GpsWaypoint {
 
     @Override
     public String toString() {
-        return "timeStamp= " + timeStamp + "latitude=" + latitude + ", longitude=" + longitude;
+        return timeStamp + ", " + latitude + ", " + longitude;
     }
 }

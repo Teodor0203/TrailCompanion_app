@@ -7,4 +7,6 @@
     <color name="PrimaryColorIDK">#0f0f0f</color>
     <color name="buttonLightTheme_border">@color/white</color>
     <color name="shadow">#38aaaa</color>
+    <color name="shadow2">#808080</color>
+    <color name="speedometerBG">#B5B5B5</color>
 </resources>

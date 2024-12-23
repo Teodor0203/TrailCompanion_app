@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity{
         if(savedInstanceState == null)
         {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.rootContainer, new FragmentConnection())
+                    .replace(R.id.rootContainer, new FragmentMainMenu())
                     .commit();
         }
     }

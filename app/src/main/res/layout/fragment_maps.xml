@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/maps_fragment"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".FragmentMaps">
 
@@ -14,13 +15,15 @@
                     android:id="@+id/map"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    tools:layout_editor_absoluteX="0dp"
+                    tools:layout_editor_absoluteY="0dp" />
 
                 <View
                     android:id="@+id/view5"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@color/ViewColor"
+                    android:layout_height="90dp"
+                    android:background="@color/speedometerBG"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -32,45 +35,60 @@
                     android:id="@+id/view6"
                     android:layout_width="wrap_content"
                     android:layout_height="5dp"
-                    android:background="@color/white"
+                    android:background="@color/black"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.137" />
+                    app:layout_constraintVertical_bias="0.12" />
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_width="282dp"
-                    android:layout_height="54dp"
+                    android:layout_width="270dp"
+                    android:layout_height="80dp"
                     android:fontFamily="sans-serif-black"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:shadowColor="@color/shadow"
+                    android:shadowColor="@color/shadow2"
                     android:shadowDx="-2"
                     android:shadowDy="2"
                     android:shadowRadius="5"
-                    android:text="TrailCompanion"
-                    android:textColor="@color/white"
-                    android:textSize="38dp"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="50dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_bias="0.773"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.03" />
+                    app:layout_constraintVertical_bias="0.0" />
 
                 <Button
                     android:id="@+id/button4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="STOP"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.976" />
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/speed__streamline_rounded_material_symbols_1_"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
