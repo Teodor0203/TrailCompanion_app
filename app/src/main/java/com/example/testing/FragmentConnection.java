@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,9 +28,12 @@ public class FragmentConnection extends Fragment {
     private NEO6M gpsModule;
     private DHT11 dht11Sensor;
     private RFP602 rfp602sensor;
+
+    private MPU6050 mpu6050sensor;
     private GpsWaypoint gpsWaypoint;
     private GpsData gpsdata;
     private PressureData pressureData;
+    private JumpData jumpData;
     private final String TAG = "FragmentConnection";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -79,6 +81,7 @@ public class FragmentConnection extends Fragment {
         gpsModule = new NEO6M("NEO6M", true);
         dht11Sensor = new DHT11("DHT11", true);
         rfp602sensor = new RFP602("RFP602", true, getContext());
+        mpu6050sensor = new MPU6050("MPU6050", true);
 
 
         return inflater.inflate(R.layout.fragment_connection, container, false);
@@ -125,11 +128,19 @@ public class FragmentConnection extends Fragment {
                             {
                                 JSONObject jsonData = new JSONObject(message);
                                 String sensorType = jsonData.getString("sensorType");
-
                                 if(dht11Sensor.getSensorType().equals(sensorType))
                                 {
                                     dht11Sensor.readData(jsonData.toString());
                                     Log.d(TAG, "onViewCreated: Reading DHT");
+                                }
+                                else if (mpu6050sensor.getSensorType().equals(sensorType)) {
+
+                                        mpu6050sensor.readData(jsonData.toString());
+
+                                        jumpData = mpu6050sensor.getAccelerometerData();
+
+                                        sharedViewmodel.updateAccData(jumpData);
+
                                 }
                                 else if (rfp602sensor.getSensorType().equals(sensorType))
                                 {
@@ -139,6 +150,7 @@ public class FragmentConnection extends Fragment {
 
                                     sharedViewmodel.updatePressureData(pressureData);
                                 }
+
                                 else if(gpsModule.getSensorType().equals(sensorType))
                                 {
                                     gpsModule.readData(jsonData.toString());
@@ -152,6 +164,7 @@ public class FragmentConnection extends Fragment {
                                     sharedViewmodel.updateGpsWaypoint(gpsWaypoint);
 
                                     Log.d(TAG, "onViewCreated: " + gpsModule.getWaypoint().toString());
+
                                 }
                             }
                             catch (JSONException e)

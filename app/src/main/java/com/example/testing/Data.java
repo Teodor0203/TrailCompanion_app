@@ -1,18 +1,17 @@
 package com.example.testing;
 
-import android.telephony.CarrierConfigManager;
-
 public class Data {
 
     private GpsWaypoint gpsWaypoint;
     private PressureData pressureData;
-
     private GpsData gpsData;
+    private JumpData accData;
 
-    public Data(GpsWaypoint gpsWaypoint, PressureData pressureData, GpsData gpsData) {
+    public Data(GpsWaypoint gpsWaypoint, PressureData pressureData, GpsData gpsData, JumpData accData) {
         this.gpsWaypoint = gpsWaypoint;
         this.pressureData = pressureData;
         this.gpsData = gpsData;
+        this.accData = accData;
     }
 
     public GpsWaypoint getGpsWaypoint() {
@@ -25,6 +24,8 @@ public class Data {
 
     public GpsData getGpsData() { return gpsData; }
 
+    public JumpData getAccData() { return accData; }
+
     public void setGpsWaypoint(GpsWaypoint gpsWaypoint) {
         this.gpsWaypoint = gpsWaypoint;
     }
@@ -34,4 +35,6 @@ public class Data {
     }
 
     public void setGpsData(GpsData gpsData) { this.gpsData = gpsData; }
+
+    public void setAccData(JumpData accData) { this.accData = accData; }
 }
