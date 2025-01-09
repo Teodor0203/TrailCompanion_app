@@ -67,23 +67,30 @@ public class FragmentMainMenu extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-
         Button goButton = view.findViewById(R.id.button3);
 
-        goButton.setOnClickListener(v -> {
-            Log.d("ConnectionManager", "onCreate: StartButton clicked");
+        Button trailsButton = view.findViewById(R.id.button6);
 
-            if (view.findViewById(R.id.rootContainer) == null) {
-                Log.e("Debug", "rootContainer nu este găsit!");
-            } else {
-                Log.d("Debug", "rootContainer este prezent.");
-            }
+        goButton.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction().setCustomAnimations(
                     R.anim.slide_in,
                     R.anim.fade_out,
                     R.anim.fade_in,
                     R.anim.slide_in
             ).replace(R.id.rootContainer, new FragmentConnection()).addToBackStack(null).commit();
+
+            Log.d(TAG, "onViewCreated: Go button pressed transition begin!");
+        });
+
+        trailsButton.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction().setCustomAnimations(
+                    R.anim.slide_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.slide_in
+            ).replace(R.id.rootContainer, new FragmentTrailsMenu()).addToBackStack(null).commit();
+
+            Log.d(TAG, "onViewCreated: Trails button clicked transition begin!");
         });
     }
 }

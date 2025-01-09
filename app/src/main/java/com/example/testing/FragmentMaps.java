@@ -1,6 +1,8 @@
 package com.example.testing;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -39,9 +42,13 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     private final List<LatLng> markers = new ArrayList<>();
     private final List<GpsWaypoint> waypoints = new ArrayList<>();
     private final List<PressureData> pressureValues = new ArrayList<>();
-    private static int index = 1;
     private Button stopButton;
-    private Marker currentMarker = null;
+    private double totalDistance = 0.0;
+    private double topSpeed= 0.0;
+    private double averageSpeed = 0.0;
+    private double totalSpeed = 0.0;
+    private int speedCount = 0;
+    private DialogInterface.OnClickListener dialogClickListener;
     private static FragmentMaps INSTANCE = null;
 
     public FragmentMaps() {
@@ -70,7 +77,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
         stopButton = view.findViewById(R.id.button4);
@@ -86,9 +94,11 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap)
+    {
         SharedViewmodel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewmodel.class);
         Log.d(TAG, "onMapReady: Map is ready");
+
 
         mMap = googleMap;
 
@@ -101,15 +111,36 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
             TextView speedometer = getView().findViewById(R.id.textView2);
 
+
+
             if(speedometer != null && gpsData != null)
             {
-                speedometer.setText(gpsData.toString());
+                speedometer.setText(gpsData.getSpeed() + " km/h");
+
+                speedCount++;
+
+                double currentSpeed = gpsData.getSpeed();
+                totalSpeed += currentSpeed;
+
+                Log.d(TAG, "CurrentSpeed " + currentSpeed);
+
+                if(currentSpeed > topSpeed)
+                {
+                    topSpeed = currentSpeed;
+                    Log.d(TAG, "TOP SPEED " + topSpeed);
+                    TrailManager.getInstance().addSpeed(topSpeed, averageSpeed);
+                }
+
+                averageSpeed = (speedCount > 0) ? Math.floor(totalSpeed/speedCount * 100) / 100 : 0.0;
+                Log.d(TAG, "!!!!!AVERAGE SPEED!!!!! " + averageSpeed);
+
             }
 
             if (waypoint != null) {
                 //Log.d(TAG, "Received waypoint: " + waypoint.getLatitude() + ", " + waypoint.getLongitude());
 
                 GpsWaypoint newWaypoint = new GpsWaypoint();
+                TrailManager.getInstance().addWaypoint(newWaypoint);
                 newWaypoint.setTimeStamp(waypoint.getTimeStamp());
                 newWaypoint.setLatitude(waypoint.getLatitude());
                 newWaypoint.setLongitude(waypoint.getLongitude());
@@ -123,10 +154,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                         mMap.addMarker(new MarkerOptions().position(firstMarker).title("Start"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
                         markers.add(firstMarker);
-                        Log.d(TAG, "First waypoint added and marker set");
                     }
 
-                    Log.d(TAG, "onMapReady: JumpDETECTED: " + jumpData.getJumpDetected());
 
                     if(jumpData.getJumpDetected() == 1)
                     {
@@ -140,9 +169,8 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             }
 
             if (pressureData != null) {
-                //Log.d(TAG, "Received pressure data: " + pressureData.getPressureValue());
-
                 PressureData newPressureData = new PressureData();
+                TrailManager.getInstance().addPressureValue(newPressureData);
                 newPressureData.setPressureValue(pressureData.getPressureValue());
                 newPressureData.setTimeStamp(pressureData.getTimeStamp());
 
@@ -155,6 +183,12 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                     if (i > 0) {
                         LatLng start = new LatLng(waypoints.get(i - 1).getLatitude(), waypoints.get(i - 1).getLongitude());
                         LatLng end = new LatLng(waypoints.get(i).getLatitude(), waypoints.get(i).getLongitude());
+
+                        totalDistance += calculateDistance(waypoints.get(i-1), waypoints.get(i));
+
+
+
+                        Log.d(TAG, "onMapReady: DISTANCE " + totalDistance);
 
                         long startTimestamp = waypoints.get(i - 1).getTimeStamp();
                         long endTimestamp = waypoints.get(i).getTimeStamp();
@@ -176,7 +210,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                         }
 
                         int segmentColor = pressureData.getSegmentColor();
-                        //Log.d(TAG, "onMapReady: Segment color " + segmentColor);
 
                         if (mMap != null) {
                             mMap.addPolyline(new PolylineOptions()
@@ -185,22 +218,15 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                                     .color(segmentColor)
                                     .width(5));
                         }
-                        //Log.d(TAG, "Pressure values remaining: " + pressureValues.size());
 
                         pressureValues.removeIf(pressure -> pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp);
                     }
 
-                    //Append nu imi umple buffer-ul!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
                     if (i < waypoints.size() - 1 && i>0)
                     {
                         waypoints.remove(i - 1);
-                        //Log.d(TAG, "Waypoint removed: " + (i - 1));
                         i--;
                     }
-
-                    //Log.d(TAG, "Remaining waypoints: " + waypoints.size());
-                    //Log.d(TAG, "Remaining pressures: " + pressureValues.size());
                 }
             }
         });
@@ -211,7 +237,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             mMap.addMarker(new MarkerOptions().position(firstMarker).title("Start"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
             markers.add(firstMarker);
-            Log.d(TAG, "onMapReady: IT ENTERED FIRST MARKER IF");
         }
 
         stopButton.setOnClickListener(view -> {
@@ -219,13 +244,82 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             if(!waypoints.isEmpty())
             {
                 LatLng finishMarker = new LatLng(waypoints.get(waypoints.size() - 1).getLatitude(), waypoints.get(waypoints.size() - 1).getLongitude());
-                Log.d(TAG, "onMapReady: Button pressed");
                 if (!markers.contains(finishMarker) && ConnectionManager.getInstance() != null) {
                     mMap.addMarker(new MarkerOptions().position(finishMarker).title("Finish"));
                     markers.add(finishMarker);
                     ConnectionManager.getInstance().stopReading();
                 }
             }
+            TrailManager.getInstance().addSpeed(topSpeed, averageSpeed);
+            TrailManager.getInstance().addDistance(totalDistance);
+
+            showDialogBox();
         });
+    }
+
+    public void showDialogBox() {
+
+        if (getActivity() != null && isAdded()) {
+
+            dialogClickListener = new DialogInterface.OnClickListener() {
+                @SuppressLint("ShowToast")
+                @Override
+                public void onClick(DialogInterface dialogInterface, int which) {
+
+
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Toast.makeText(getContext(), "Trail was saved", Toast.LENGTH_LONG).show();
+                            TrailManager.getInstance().saveTrailToFile(getContext(), ("Trail " + TrailManager.getInstance().loadIndexFromFile(getContext())));
+                            getParentFragmentManager().beginTransaction().setCustomAnimations(
+                                    R.anim.slide_in,
+                                    R.anim.fade_out,
+                                    R.anim.fade_in,
+                                    R.anim.slide_in
+                            ).replace(R.id.rootContainer, new FragmentMainMenu()).commit();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            Toast.makeText(getContext(), "Trail was not saved", Toast.LENGTH_LONG).show();
+                            getParentFragmentManager().beginTransaction().setCustomAnimations(
+                                    R.anim.slide_in,
+                                    R.anim.fade_out,
+                                    R.anim.fade_in,
+                                    R.anim.slide_in
+                            ).replace(R.id.rootContainer, new FragmentMainMenu()).commit();
+                            dialogInterface.dismiss();
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            builder.setMessage("Do you want to save the ride?")
+                    .setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener)
+                    .show();
+        }
+    }
+
+    public double calculateDistance(GpsWaypoint waypoint1, GpsWaypoint waypoint2) {
+        final int R = 6371; //Earth's radius in km
+
+        double lat1 = Math.toRadians(waypoint1.getLatitude());
+        double lon1 = Math.toRadians(waypoint1.getLongitude());
+        double lat2 = Math.toRadians(waypoint2.getLatitude());
+        double lon2 = Math.toRadians(waypoint2.getLongitude());
+
+        //Haversine formula
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        double distance = R * c; // în km
+
+        return Math.floor(distance * 1000) / 1000;
     }
 }

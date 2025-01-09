@@ -23,13 +23,13 @@ public class PressureData {
 
     public int getSegmentColor()
     {
-        if (pressureValue >= 0 && pressureValue <= 500) {
+        if (pressureValue >= 0 && pressureValue <= 10) {
             segmentColor = Color.parseColor("#ff35c025"); // Verde
-        } else if (pressureValue > 500 && pressureValue <= 1000) {
+        } else if (pressureValue > 10 && pressureValue <= 25) {
             segmentColor = Color.parseColor("#ffece816"); // Galben
-        } else if (pressureValue > 1000 && pressureValue <= 1500) {
+        } else if (pressureValue > 25 && pressureValue <= 45 ) {
             segmentColor = Color.parseColor("#ffec8716"); // Portocaliu
-        } else if(pressureValue > 1800){
+        } else if(pressureValue > 50){
             segmentColor = Color.parseColor("#ffda2424");
         }
 

@@ -108,8 +108,11 @@ public class FragmentConnection extends Fragment {
         }
 
         connectDevice.setOnClickListener(v -> {
-            ConnectionManager.getInstance(getActivity(), loadingConnetion, deviceConected, startButton).enableBluetooth(getActivity());
-            ConnectionManager.getInstance(getActivity(), loadingConnetion, deviceConected, startButton).connectToESP();
+            /*ConnectionManager connectionManager = new ConnectionManager(getContext(), loadingConnetion, deviceConected, startButton);
+            connectionManager.enableBluetooth(getActivity());
+            connectionManager.connectToESP();*/
+            ConnectionManager.getInstance(getContext(), loadingConnetion, deviceConected, startButton).enableBluetooth(getActivity());
+            ConnectionManager.getInstance().connectToESP(getContext(), loadingConnetion, deviceConected, startButton);
         });
 
         startButton.setOnClickListener(view1 -> {

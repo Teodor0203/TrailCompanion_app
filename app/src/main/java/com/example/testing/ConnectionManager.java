@@ -18,6 +18,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
@@ -41,7 +43,7 @@ public class ConnectionManager implements DataCallback {
     //endregion
 
     //region other
-    private static ConnectionManager INSTACE;
+    private static ConnectionManager INSTANCE;
     private Context context;
     private BluetoothSocket bluetoothSocket;
     private InputStream inputStream;
@@ -63,19 +65,19 @@ public class ConnectionManager implements DataCallback {
     }
 
     public static ConnectionManager getInstance() {
-        if (INSTACE == null) {
-            INSTACE = new ConnectionManager();
+        if (INSTANCE == null) {
+            INSTANCE = new ConnectionManager();
         }
 
-        return INSTACE;
+        return INSTANCE;
     }
 
     public static ConnectionManager getInstance(Context context, ProgressBar progressBar, TextView textView, Button startButton) {
-        if (INSTACE == null) {
-            INSTACE = new ConnectionManager(context, progressBar, textView, startButton);
+        if (INSTANCE == null) {
+            INSTANCE = new ConnectionManager(context, progressBar, textView, startButton);
         }
 
-        return INSTACE;
+        return INSTANCE;
     }
 
     public void checkIfBluetoothIsSupported() {
@@ -102,7 +104,7 @@ public class ConnectionManager implements DataCallback {
                             ((Activity) context).runOnUiThread(() ->
                                     Toast.makeText(context, "Looking for device!", Toast.LENGTH_LONG).show()
                             );
-                            connectToESP();
+                            connectToESP(context, progressBar, textView, startButton);
                         }
                     }
                 }
@@ -162,9 +164,14 @@ public class ConnectionManager implements DataCallback {
     }
 
     @SuppressLint("MissingPermission")
-    public void connectToESP() {
+    public void connectToESP(Context context, ProgressBar progressBar, TextView textView, Button button) {
         String targetDeviceName = "ESP32";
         final BluetoothDevice[] device = {null};
+
+        this.context = context;
+        this.progressBar = progressBar;
+        this.textView = textView;
+        this.startButton = button;
 
         if (adapter.isDiscovering()) {
             Log.d(TAG, "connectToESP: Starts descovering");

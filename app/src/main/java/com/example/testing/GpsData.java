@@ -11,6 +11,10 @@ public class GpsData {
 
     public void setSpeedValue(double speed) { this.speed = speed; }
 
+    public double getSpeed() {
+        return speed;
+    }
+
     public void setTimeStamp(long timeStamp) { this.timeStamp = timeStamp; }
 
     @Override
