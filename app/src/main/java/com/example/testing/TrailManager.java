@@ -149,9 +149,7 @@ public class TrailManager
                 JSONArray start = segment.getJSONArray("start");
                 JSONArray end = segment.getJSONArray("end");
                 long pressure = segment.getLong("pressure");
-                double fileTopSpeed = segment.getDouble("topSpeed");
-                double fileAverageSpeed = segment.getDouble("averageSpeed");
-                double fileDistance = segment.getDouble("distance");
+
 
                 LatLng startLatLng = new LatLng(start.getDouble(0), start.getDouble(1));
                 LatLng endLatLng = new LatLng(end.getDouble(0), end.getDouble(1));
@@ -181,17 +179,15 @@ public class TrailManager
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLatLng, 20));
 
-                if(topSpeed != null && averageSpeed != null && distance != null)
-                {
-                    topSpeed.setText(" " + fileTopSpeed + " km/h.");
-                    averageSpeed.setText(" " + fileAverageSpeed + " km/h.");
-                    distance.setText(" " + fileDistance + " km.");
-                }
-                else
-                {
-                    topSpeed.setText("NaN");
-                    averageSpeed.setText("NaN");
-                    distance.setText("NaN");
+                String fileTopSpeed = segment.has("topSpeed") ? String.valueOf(segment.getDouble("topSpeed")) : "NaN";
+                String fileAverageSpeed = segment.has("averageSpeed") ? String.valueOf(segment.getDouble("averageSpeed")) : "NaN";
+                String fileDistance = segment.has("distance") ? String.valueOf(segment.getDouble("distance")) : "NaN";
+
+                if (topSpeed != null && averageSpeed != null && distance != null) {
+                    topSpeed.setText(fileTopSpeed + " km/h.");
+                    averageSpeed.setText(fileAverageSpeed + " km/h.");
+                    distance.setText(fileDistance + " km.");
+
                 }
             }
 

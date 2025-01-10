@@ -40,9 +40,9 @@ public class FragmentTrailsMenu extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         trailsContainer = view.findViewById(R.id.trails_container);
+        trailsContainer.removeAllViews();
 
         List<String> loadedSavedTrails = loadSavedTrails(getContext());
-
 
         if(savedTrails != null)
         {
@@ -100,7 +100,10 @@ public class FragmentTrailsMenu extends Fragment {
 
             while(line != null)
             {
-                savedTrails.add(line);
+                if (!savedTrails.contains(line))
+                {
+                    savedTrails.add(line);
+                }
                 line = reader.readLine();
             }
             fis.close();
