@@ -31,9 +31,11 @@ public class FragmentTrailMaps extends Fragment implements OnMapReadyCallback {
     private String mParam1;
     private String mParam2;
     private String trailName;
-    TrailManager trailManager = new TrailManager();
 
     private GoogleMap mMap;
+
+    TrailManager trailManager = new TrailManager();
+
 
     public FragmentTrailMaps(String trailName) {
         this.trailName = trailName;

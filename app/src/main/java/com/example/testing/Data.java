@@ -2,10 +2,13 @@ package com.example.testing;
 
 public class Data {
 
+
+    //region Data
     private GpsWaypoint gpsWaypoint;
     private PressureData pressureData;
     private GpsData gpsData;
     private JumpData accData;
+    //endregion
 
     public Data(GpsWaypoint gpsWaypoint, PressureData pressureData, GpsData gpsData, JumpData accData) {
         this.gpsWaypoint = gpsWaypoint;

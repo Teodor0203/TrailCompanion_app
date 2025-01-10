@@ -15,18 +15,12 @@ public class JumpData {
         this.airTime = airTime;
     }
 
-    public float getAirTime() {
-        return airTime;
-    }
-
     public int getJumpDetected() {
         return jumpDetected;
     }
 
     @Override
     public String toString() {
-        return "AccelerometerData{" +
-                "jumpDetected=" + jumpDetected +
-                '}';
+        return "jumpDetected: " + jumpDetected;
     }
 }

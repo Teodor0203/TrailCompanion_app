@@ -4,7 +4,6 @@ import android.graphics.Color;
 
 public class GpsData {
 
-    private long timeStamp;
     private double speed;
 
     public GpsData() {}
@@ -14,8 +13,6 @@ public class GpsData {
     public double getSpeed() {
         return speed;
     }
-
-    public void setTimeStamp(long timeStamp) { this.timeStamp = timeStamp; }
 
     @Override
     public String toString() {

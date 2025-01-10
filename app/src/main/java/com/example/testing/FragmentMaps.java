@@ -39,16 +39,24 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
     private final String TAG = "FragmentMaps";
     private GoogleMap mMap;
 
+    //region Lists
     private final List<LatLng> markers = new ArrayList<>();
     private final List<GpsWaypoint> waypoints = new ArrayList<>();
     private final List<PressureData> pressureValues = new ArrayList<>();
-    private Button stopButton;
+    //endregion
+
+    //region stats variables
     private double totalDistance = 0.0;
     private double topSpeed= 0.0;
     private double averageSpeed = 0.0;
     private double totalSpeed = 0.0;
     private int speedCount = 0;
+    //endregion
+
+    private Button stopButton;
+
     private DialogInterface.OnClickListener dialogClickListener;
+
     private static FragmentMaps INSTANCE = null;
 
     public FragmentMaps() {
