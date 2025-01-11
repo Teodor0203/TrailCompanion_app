@@ -25,15 +25,21 @@ import org.json.JSONObject;
  */
 public class FragmentConnection extends Fragment {
 
+    //region Sensors
     private NEO6M gpsModule;
     private DHT11 dht11Sensor;
     private RFP602 rfp602sensor;
 
     private MPU6050 mpu6050sensor;
+    //endregion
+
+    //region Data
     private GpsWaypoint gpsWaypoint;
     private GpsData gpsdata;
     private PressureData pressureData;
     private JumpData jumpData;
+    //endregion
+
     private final String TAG = "FragmentConnection";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";

@@ -9,8 +9,8 @@ public class MPU6050 extends Sensor{
 
     private JumpData jumpData;
     private final String TAG = "Accelerometer";
-    private long airTime = 0;
     private boolean jumpActive = false;
+    private long airTime = 0;
     private float jumpDuration = 0.0f;
 
     public MPU6050(String sensorType, boolean isActive){

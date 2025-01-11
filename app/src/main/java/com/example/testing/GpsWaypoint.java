@@ -8,8 +8,7 @@ public class GpsWaypoint {
     private double longitude;
     private long timeStamp;
 
-    public GpsWaypoint() {
-    }
+    public GpsWaypoint() {}
 
     public synchronized void setLatitude(double latitude) {
         this.latitude = latitude;

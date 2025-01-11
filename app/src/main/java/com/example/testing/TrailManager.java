@@ -25,9 +25,13 @@ import java.util.List;
 public class TrailManager
 {
     private static TrailManager INSTANCE;
+
+    //region Lists
     private List<GpsWaypoint> waypoints;
     private List<GpsWaypoint> jumpWaypoints;
     private List<PressureData> pressureValues;
+    //endregion
+
     private double distance;
     private double topSpeed, averageSpeed;
     private static final String TAG = "TrailManager";
