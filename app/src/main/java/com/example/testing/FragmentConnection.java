@@ -98,7 +98,7 @@ public class FragmentConnection extends Fragment {
         Button connectDevice = view.findViewById(R.id.button);
 
         ProgressBar loadingConnetion = view.findViewById(R.id.progressBar);
-        loadingConnetion.getIndeterminateDrawable().setColorFilter(Color.GRAY, android.graphics.PorterDuff.Mode.MULTIPLY);
+        loadingConnetion.getIndeterminateDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.MULTIPLY);
         loadingConnetion.setVisibility(View.INVISIBLE);
 
         SharedViewmodel sharedViewmodel = new ViewModelProvider(requireActivity()).get(SharedViewmodel.class);
@@ -186,11 +186,12 @@ public class FragmentConnection extends Fragment {
                 Log.d(TAG, "onViewCreated: Nu este");
             }
 
-            getParentFragmentManager().beginTransaction().setCustomAnimations(
-                    R.anim.slide_in,
-                    R.anim.fade_out,
-                    R.anim.fade_in,
-                    R.anim.slide_in
+            getParentFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fade_in,
+                            R.anim.fade_out,
+                            R.anim.fade_in,
+                            R.anim.fade_out
             ).replace(R.id.rootContainer, new FragmentMaps()).commit();
         });
     }

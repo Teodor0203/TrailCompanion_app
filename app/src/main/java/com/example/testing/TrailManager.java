@@ -129,6 +129,8 @@ public class TrailManager
         Log.d("MAMA", "drawTrailFromFile: READING");
         try
         {
+
+
             FileInputStream fis = context.openFileInput(fileName);
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
             StringBuilder jsonBuilder = new StringBuilder();
@@ -175,7 +177,8 @@ public class TrailManager
                         .clickable(true)
                         .add(startLatLng, endLatLng)
                         .color(segmentColor)
-                        .width(5));
+                        .width(10));
+
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLatLng, 20));
 

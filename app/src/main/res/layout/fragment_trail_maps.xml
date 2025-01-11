@@ -21,6 +21,7 @@
             tools:layout_editor_absoluteY="-16dp" />
 
         <View
+            android:alpha="0.85"
             android:id="@+id/view"
             android:layout_width="wrap_content"
             android:layout_height="135dp"
@@ -127,6 +128,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.065" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Terrain"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.95"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.976" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

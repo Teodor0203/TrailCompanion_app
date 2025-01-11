@@ -2,6 +2,7 @@ package com.example.testing;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -10,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainer;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -55,7 +58,17 @@ public class FragmentTrailsMenu extends Fragment {
 
     private void addTrailButton(String trailName) {
         Button trailButton = new Button(getActivity());
+
+        ProgressBar progressBar = getView().findViewById(R.id.progressBar1);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.MULTIPLY);
+
+        if(progressBar != null)
+        {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+
         trailButton.setText(trailName);
+
         int widthInPx = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 340,
@@ -72,18 +85,25 @@ public class FragmentTrailsMenu extends Fragment {
 
         trailButton.setHeight(200);
         trailButton.setTextSize(35);
-        trailButton.setBackgroundColor(getResources().getColor(R.color.ViewColor));
-        trailButton.setTextColor(getResources().getColor(R.color.white));
+        trailButton.setBackgroundColor(getResources().getColor(R.color.ViewColor, null));
+        trailButton.getBackground().setAlpha(150);
+        trailButton.setTextColor(getResources().getColor(R.color.white, null));
         trailButton.setBackgroundResource(R.drawable.button_radius);
 
         trailsContainer.addView(trailButton);
         trailButton.setOnClickListener(view -> {
-            getParentFragmentManager().beginTransaction().setCustomAnimations(
-                    R.anim.slide_in,
+            getParentFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                    R.anim.fade_in,
                     R.anim.fade_out,
                     R.anim.fade_in,
-                    R.anim.slide_in
-            ).replace(R.id.rootContainer, new FragmentTrailMaps(trailName)).addToBackStack(null).commit();
+                    R.anim.fade_out
+            ).replace(R.id.rootContainer, new FragmentTrailMaps(trailName, progressBar)).addToBackStack(null).commit();
+
+            if(progressBar != null)
+            {
+                progressBar.setVisibility(View.VISIBLE);
+            }
         });
 
     }

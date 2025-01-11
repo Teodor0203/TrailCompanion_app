@@ -9,11 +9,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,12 +34,16 @@ public class FragmentTrailMaps extends Fragment implements OnMapReadyCallback {
     private String mParam1;
     private String mParam2;
     private String trailName;
+    private ProgressBar progressBar;
     TrailManager trailManager = new TrailManager();
 
     private GoogleMap mMap;
 
-    public FragmentTrailMaps(String trailName) {
+    public FragmentTrailMaps(){}
+
+    public FragmentTrailMaps(String trailName, ProgressBar progressBar) {
         this.trailName = trailName;
+        this.progressBar = progressBar;
         Log.d("FragmentTRAILS", "FragmentTrailMaps: TRAIL NAME" + trailName);
         // Required empty public constructor
     }
@@ -51,8 +58,7 @@ public class FragmentTrailMaps extends Fragment implements OnMapReadyCallback {
      */
     // TODO: Rename and change types and number of parameters
     public static FragmentTrailMaps newInstance(String param1, String param2) {
-        String trailName = "";
-        FragmentTrailMaps fragment = new FragmentTrailMaps(trailName);
+        FragmentTrailMaps fragment = new FragmentTrailMaps();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -87,14 +93,56 @@ public class FragmentTrailMaps extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+
+        if(progressBar != null)
+        {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+
         mMap = googleMap;
 
         TextView distanceText = getView().findViewById(R.id.distanceText);
         TextView topSpeedText = getView().findViewById(R.id.topSpeedText);
         TextView averageSpeedText = getView().findViewById(R.id.averageSpeedText);
 
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.map_style_2));
+
+        Button mapTypeButton = getView().findViewById(R.id.button5);
+
+        mapTypeButton.setOnClickListener(view -> {
+            changeMapType(mMap, mapTypeButton);
+        });
+
+
 
         trailManager.drawTrailFromFile(getContext(), trailName, mMap, topSpeedText, distanceText, averageSpeedText);
         Log.d("TrailManager", "onMapReady: CALLED  ");
+    }
+
+    public void changeMapType(GoogleMap map, Button mapTypeButton)
+    {
+
+
+        if(map.getMapType() == GoogleMap.MAP_TYPE_NORMAL && mapTypeButton.getText().equals("Terrain"))
+        {
+            mapTypeButton.setTextColor(getResources().getColor(R.color.white, null));
+            mapTypeButton.setText("Satellite");
+            map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.map_style_2));
+        }
+        else if (map.getMapType() == GoogleMap.MAP_TYPE_TERRAIN && mapTypeButton.getText().equals("Satellite"))
+        {
+            mapTypeButton.setTextColor(getResources().getColor(R.color.white, null));
+            mapTypeButton.setText("Normal");
+            map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+        else if (map.getMapType() == GoogleMap.MAP_TYPE_SATELLITE && mapTypeButton.getText().equals("Normal"))
+        {
+            mapTypeButton.setTextColor(getResources().getColor(R.color.white, null));
+            mapTypeButton.setText("Terrain");
+            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
     }
 }

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -217,6 +218,11 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                                     .add(start, end)
                                     .color(segmentColor)
                                     .width(5));
+                        }
+
+                        if(mMap != null)
+                        {
+                            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.map_style_2));
                         }
 
                         pressureValues.removeIf(pressure -> pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp);

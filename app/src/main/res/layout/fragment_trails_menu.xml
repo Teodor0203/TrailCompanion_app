@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/map_background_3"
     android:id="@+id/trails_menu_fragment"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -12,6 +13,7 @@
 
         <View
             android:id="@+id/view"
+            android:alpha="0.85"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
             android:background="@color/ViewColor"
@@ -21,6 +23,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"/>
+
+
 
         <TextView
             android:id="@+id/textView3"
@@ -66,6 +70,7 @@
 
         <View
             android:id="@+id/view4"
+            android:alpha="0.85"
             android:layout_width="wrap_content"
             android:layout_height="5dp"
             android:background="@color/white"
@@ -75,6 +80,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.13" />
+
+
 
         <ScrollView
             android:layout_width="410dp"
@@ -91,10 +98,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="10dp">
-
-            </LinearLayout>
+                android:padding="10dp"/>
         </ScrollView>
+
+        <View
+            android:id="@+id/view5"
+            android:alpha="0.95"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:background="@color/ViewColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            android:alpha="0.85"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias=".99" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

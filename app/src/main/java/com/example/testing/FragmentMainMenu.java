@@ -72,22 +72,26 @@ public class FragmentMainMenu extends Fragment {
         Button trailsButton = view.findViewById(R.id.button6);
 
         goButton.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction().setCustomAnimations(
-                    R.anim.slide_in,
-                    R.anim.fade_out,
-                    R.anim.fade_in,
-                    R.anim.slide_in
+            getParentFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .setCustomAnimations(
+                            R.anim.slide_in,
+                            R.anim.slide_out,
+                            R.anim.slide_in,
+                            R.anim.slide_out
             ).replace(R.id.rootContainer, new FragmentConnection()).addToBackStack(null).commit();
 
             Log.d(TAG, "onViewCreated: Go button pressed transition begin!");
         });
 
         trailsButton.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction().setCustomAnimations(
-                    R.anim.slide_in,
-                    R.anim.fade_out,
-                    R.anim.fade_in,
-                    R.anim.slide_in
+            getParentFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .setCustomAnimations(
+                            R.anim.fade_in,
+                            R.anim.fade_out,
+                            R.anim.fade_in,
+                            R.anim.fade_out
             ).replace(R.id.rootContainer, new FragmentTrailsMenu()).addToBackStack(null).commit();
 
             Log.d(TAG, "onViewCreated: Trails button clicked transition begin!");
