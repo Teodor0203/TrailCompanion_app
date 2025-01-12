@@ -57,7 +57,6 @@ public class FragmentTrailsMenu extends Fragment {
         }
     }
 
-
     private void addTrailButton(String trailName) {
         Button trailButton = new Button(getActivity());
 
@@ -136,10 +135,5 @@ public class FragmentTrailsMenu extends Fragment {
         }
 
        return savedTrails;
-    }
-
-
-    public LinearLayout getTrailsContainer() {
-        return trailsContainer;
     }
 }

@@ -18,11 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentMainMenu#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentMainMenu extends Fragment {
 
     private final String TAG = "FragmentMainMenu";
@@ -80,8 +75,6 @@ public class FragmentMainMenu extends Fragment {
                             R.anim.slide_in,
                             R.anim.slide_out
             ).replace(R.id.rootContainer, new FragmentConnection()).addToBackStack(null).commit();
-
-            Log.d(TAG, "onViewCreated: Go button pressed transition begin!");
         });
 
         trailsButton.setOnClickListener(v -> {
@@ -93,8 +86,6 @@ public class FragmentMainMenu extends Fragment {
                             R.anim.fade_in,
                             R.anim.fade_out
             ).replace(R.id.rootContainer, new FragmentTrailsMenu()).addToBackStack(null).commit();
-
-            Log.d(TAG, "onViewCreated: Trails button clicked transition begin!");
         });
     }
 }

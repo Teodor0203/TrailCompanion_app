@@ -130,11 +130,8 @@ public class TrailManager
     @SuppressLint("SetTextI18n")
     public void drawTrailFromFile(Context context, String fileName, GoogleMap mMap, TextView topSpeed, TextView distance, TextView averageSpeed)
     {
-        Log.d("MAMA", "drawTrailFromFile: READING");
         try
         {
-
-
             FileInputStream fis = context.openFileInput(fileName);
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
             StringBuilder jsonBuilder = new StringBuilder();
@@ -160,9 +157,6 @@ public class TrailManager
                 LatLng startLatLng = new LatLng(start.getDouble(0), start.getDouble(1));
                 LatLng endLatLng = new LatLng(end.getDouble(0), end.getDouble(1));
 
-                Log.d(TAG, "drawTrailFromFile: START" + start.getDouble(0));
-                Log.d(TAG, "drawTrailFromFile: END " + end.getDouble(0) );
-
                 PressureData pressureData = new PressureData();
                 pressureData.setPressureValue(pressure);
                 int segmentColor = pressureData.getSegmentColor();
@@ -182,8 +176,7 @@ public class TrailManager
                         .add(startLatLng, endLatLng)
                         .color(segmentColor)
                         .width(10));
-
-
+                
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLatLng, 20));
 
                 String fileTopSpeed = segment.has("topSpeed") ? String.valueOf(segment.getDouble("topSpeed")) : "NaN";

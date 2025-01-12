@@ -18,11 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FragmentConnection#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FragmentConnection extends Fragment {
 
     //region Sensors
@@ -44,7 +39,6 @@ public class FragmentConnection extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -52,15 +46,6 @@ public class FragmentConnection extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentConnection.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FragmentConnection newInstance(String param1, String param2) {
         FragmentConnection fragment = new FragmentConnection();
         Bundle args = new Bundle();
@@ -86,7 +71,7 @@ public class FragmentConnection extends Fragment {
 
         gpsModule = new NEO6M("NEO6M", true);
         dht11Sensor = new DHT11("DHT11", true);
-        rfp602sensor = new RFP602("RFP602", true, getContext());
+        rfp602sensor = new RFP602("RFP602", true);
         mpu6050sensor = new MPU6050("MPU6050", true);
 
 
@@ -97,7 +82,6 @@ public class FragmentConnection extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView speedometer = view.findViewById(R.id.textView2);
         Button startButton = view.findViewById(R.id.button2);
 
         TextView deviceConected = view.findViewById(R.id.textView4);
@@ -114,9 +98,6 @@ public class FragmentConnection extends Fragment {
         }
 
         connectDevice.setOnClickListener(v -> {
-            /*ConnectionManager connectionManager = new ConnectionManager(getContext(), loadingConnetion, deviceConected, startButton);
-            connectionManager.enableBluetooth(getActivity());
-            connectionManager.connectToESP();*/
             ConnectionManager.getInstance(getContext(), loadingConnetion, deviceConected, startButton).enableBluetooth(getActivity());
             ConnectionManager.getInstance().connectToESP(getContext(), loadingConnetion, deviceConected, startButton);
         });

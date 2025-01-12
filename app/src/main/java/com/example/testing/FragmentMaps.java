@@ -146,8 +146,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             }
 
             if (waypoint != null) {
-                //Log.d(TAG, "Received waypoint: " + waypoint.getLatitude() + ", " + waypoint.getLongitude());
-
                 GpsWaypoint newWaypoint = new GpsWaypoint();
                 TrailManager.getInstance().addWaypoint(newWaypoint);
                 newWaypoint.setTimeStamp(waypoint.getTimeStamp());
@@ -194,8 +192,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                         LatLng end = new LatLng(waypoints.get(i).getLatitude(), waypoints.get(i).getLongitude());
 
                         totalDistance += calculateDistance(waypoints.get(i-1), waypoints.get(i));
-
-
 
                         Log.d(TAG, "onMapReady: DISTANCE " + totalDistance);
 
@@ -275,12 +271,13 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
         if (getActivity() != null && isAdded()) {
 
+            //Create a listener for handling button clicks on the dialog
             dialogClickListener = new DialogInterface.OnClickListener() {
                 @SuppressLint("ShowToast")
                 @Override
                 public void onClick(DialogInterface dialogInterface, int which) {
 
-
+                    //The switch statement handles the actions based on the button pressed
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             Toast.makeText(getContext(), "Trail was saved", Toast.LENGTH_LONG).show();
@@ -307,10 +304,11 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
+            // Set the message and the buttons (Yes/No)
             builder.setMessage("Do you want to save the ride?")
-                    .setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener)
-                    .show();
+                    .setPositiveButton("Yes", dialogClickListener) // Set "Yes" button action
+                    .setNegativeButton("No", dialogClickListener) // Set "No" button action
+                    .show(); // Show the dialog
         }
     }
 
@@ -332,7 +330,7 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        double distance = R * c; // în km
+        double distance = R * c;
 
         return Math.floor(distance * 1000) / 1000;
     }

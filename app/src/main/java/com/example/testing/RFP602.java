@@ -10,11 +10,9 @@ public class RFP602 extends Sensor {
 
     private final String TAG = "RFP602";
     private PressureData pressureData;
-    private Context context;
 
-    public RFP602(String sensorType, boolean isActive, Context context) {
+    public RFP602(String sensorType, boolean isActive) {
         super(sensorType, isActive);
-        this.context = context;
     }
 
     @Override
