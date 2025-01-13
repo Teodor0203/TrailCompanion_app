@@ -9,9 +9,11 @@ public class PressureData {
 
     public PressureData() {}
 
-    public void setPressureValue(long pressureValue) { this.pressureValue = pressureValue; }
+    public void setPressureValue(long pressureValue) {
+        this.pressureValue = pressureValue; }
 
-    public void setTimeStamp(long timeStamp) { this.timeStamp = timeStamp; }
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp; }
 
     public long getTimeStamp() {
         return timeStamp;

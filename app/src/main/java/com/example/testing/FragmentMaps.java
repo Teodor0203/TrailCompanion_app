@@ -108,7 +108,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
         SharedViewmodel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewmodel.class);
         Log.d(TAG, "onMapReady: Map is ready");
 
-
         mMap = googleMap;
 
         sharedViewModel.getDataLiveData().observe(getViewLifecycleOwner(), data -> {
@@ -119,8 +118,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
             JumpData jumpData = data.getAccData();
 
             TextView speedometer = getView().findViewById(R.id.textView2);
-
-
 
             if(speedometer != null && gpsData != null)
             {
@@ -141,8 +138,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                 }
 
                 averageSpeed = (speedCount > 0) ? Math.floor(totalSpeed/speedCount * 100) / 100 : 0.0;
-                Log.d(TAG, "!!!!!AVERAGE SPEED!!!!! " + averageSpeed);
-
             }
 
             if (waypoint != null) {
@@ -152,7 +147,9 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                 newWaypoint.setLatitude(waypoint.getLatitude());
                 newWaypoint.setLongitude(waypoint.getLongitude());
 
-                if (waypoints.isEmpty() || waypoints.get(waypoints.size() - 1).getTimeStamp() != waypoint.getTimeStamp()) {
+                if (waypoints.isEmpty() || (waypoints.get(waypoints.size() - 1).getLatitude() != waypoint.getLatitude() ||
+                                waypoints.get(waypoints.size() - 1).getLongitude() != waypoint.getLongitude()))
+                {
                     waypoints.add(newWaypoint);
 
                     if (waypoints.size() == 1)
@@ -162,7 +159,6 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstMarker, 20));
                         markers.add(firstMarker);
                     }
-
 
                     if(jumpData.getJumpDetected() == 1)
                     {
@@ -192,23 +188,11 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
                         LatLng end = new LatLng(waypoints.get(i).getLatitude(), waypoints.get(i).getLongitude());
 
                         totalDistance += calculateDistance(waypoints.get(i-1), waypoints.get(i));
-
-                        Log.d(TAG, "onMapReady: DISTANCE " + totalDistance);
-
+                        
                         long startTimestamp = waypoints.get(i - 1).getTimeStamp();
                         long endTimestamp = waypoints.get(i).getTimeStamp();
 
-                        long pressureValueBetweenTwoPoints = 0;
-                        int count = 0;
-
-                        for (PressureData pressure : pressureValues) {
-                            if (pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp) {
-                                pressureValueBetweenTwoPoints += pressure.getPressureValue();
-                                count++;
-                            }
-                        }
-
-                        long averagePressureBetweenTwoPoints = (count > 0) ? (pressureValueBetweenTwoPoints / count) : 0;
+                        long averagePressureBetweenTwoPoints = getAveragePressureBetweenTwoPoints(startTimestamp, endTimestamp);
 
                         if (pressureData != null) {
                             pressureData.setPressureValue(averagePressureBetweenTwoPoints);
@@ -265,6 +249,20 @@ public class FragmentMaps extends Fragment implements OnMapReadyCallback {
 
             showDialogBox();
         });
+    }
+
+    private long getAveragePressureBetweenTwoPoints(long startTimestamp, long endTimestamp) {
+        long pressureValueBetweenTwoPoints = 0;
+        int count = 0;
+
+        for (PressureData pressure : pressureValues) {
+            if (pressure.getTimeStamp() >= startTimestamp && pressure.getTimeStamp() <= endTimestamp) {
+                pressureValueBetweenTwoPoints += pressure.getPressureValue();
+                count++;
+            }
+        }
+
+        return (count > 0) ? (pressureValueBetweenTwoPoints / count) : 0;
     }
 
     public void showDialogBox() {
