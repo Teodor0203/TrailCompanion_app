@@ -11,3 +11,7 @@ To use the app, the user must ensure that the device is powered on, the app is i
 3. Once the device is found, it connects via Bluetooth, and a "**Start**" button appears at the bottom of the screen.
 4. Pressing "**Start**" begins data transmission from the device and the route is mapped in real time.
 5. At the bottom of the screen, a "**Stop**" button is available. Pressing it stops data collection and prompts the user to **save** the trail.
+
+## Where are the rides saved?
+
+Currently, all ride data is stored locally on the device. In a future update, the app will support cloud storage, allowing users to save their rides in a database. If there is no internet connection, the data will be stored internally and synced once a connection is available.
